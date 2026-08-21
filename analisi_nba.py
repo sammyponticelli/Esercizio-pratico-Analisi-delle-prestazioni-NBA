@@ -89,7 +89,7 @@ def age_group_build(data_impact):
                                        labels=['19-22','23-26','27-30','31-34','35+'])
     grouped = data_impact.groupby('age_group', observed=True)
     table = grouped['impact_score'].agg(['count','mean','max']).round(2).T
-    table = table.rename(columns={'count':'players_number',
+    table = table.rename(index={'count':'players_number',
                                    'mean':'average_impact_score',
                                    'max':'max_impact_score'})
 
