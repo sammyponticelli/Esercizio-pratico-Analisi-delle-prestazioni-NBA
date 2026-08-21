@@ -113,6 +113,7 @@ def correlation_age_impact_score(data_impact):
     correlation = data_impact['age_completed_years'].corr(data_impact['impact_score']).round(2)
 
     return correlation
+
     
 #main program
 data_set = visualize_dataset(data)   
