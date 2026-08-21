@@ -12,8 +12,7 @@ data_impact = data[['player_name', 'age_completed_years', 'team', 'position', 'm
 #Initializing the dataset visualization functions
 
 def visualize_dataset(data):
-    print(data.head())
-    print(data.tail())
+    print(data.head(10))
     print(data.dtypes)
 
 def visualize_impact_dataset(data_impact):
@@ -27,7 +26,7 @@ def visualize_impact_dataset(data_impact):
 
     data_impact.drop(columns = ['one_point_made', 'two_point_made', 'three_point_made', 'wins', 'losses',
                                 'defensive_rebounds','offensive_rebounds'], inplace=True)
-    print(data_impact.head()) 
+    print(data_impact.head(10)) 
     return data_impact
 
 def calculate_per_game(data_impact):
@@ -52,7 +51,7 @@ def calculate_per_game(data_impact):
      data_impact.drop(columns = ['one_point_made', 'two_point_made', 'three_point_made', 'wins', 'losses',
                                     'defensive_rebounds','offensive_rebounds','minutes_played','steals',
                                     'blocks','turnovers','assists','PTS','REB','minutes_played'], inplace=True)
-     print(data_impact.head())
+     print(data_impact.head(10))
      return data_impact
 
 def impact_score_calculator(data_impact):
@@ -83,6 +82,25 @@ def age_average_calc(data_impact):
 
     return age_average
 
+def age_group_build(data_impact):
+    data_impact = data_impact.copy()
+    data_impact['age_group'] = pd.cut(data_impact['age_completed_years'],
+                                       bins=[19, 22, 26, 30, 34, np.inf], 
+                                       labels=['19-22','23-26','27-30','31-34','35+'])
+    grouped = data_impact.groupby('age_group', observed=True)
+    table = grouped['impact_score'].agg(['count','mean','max']).round(2).T
+    table = table.rename(columns={'count':'players_number',
+                                   'mean':'average_impact_score',
+                                   'max':'max_impact_score'})
+
+    print(table)
+
+    return table
+    
+
+
+
+
 
 
 
@@ -105,4 +123,6 @@ average_top10 = average_top10_calc(impact_score)
 print('average_top10:', average_top10)
 age_average = age_average_calc(impact_score)
 print('age_average_top10:', age_average)
+print('\n')
+age_table = age_group_build(impact_score)
 
