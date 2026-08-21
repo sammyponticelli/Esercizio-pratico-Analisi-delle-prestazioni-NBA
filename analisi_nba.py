@@ -2,6 +2,7 @@
 
 import pandas as pd
 import numpy as np  
+import matplotlib.pyplot as plt
 
 #variable to store the dataset
 data = pd.read_csv("nba_players_25_26_regular_season_wide_data.csv")
