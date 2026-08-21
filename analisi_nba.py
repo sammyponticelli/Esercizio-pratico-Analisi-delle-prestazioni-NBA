@@ -104,8 +104,15 @@ def scatter_plot_age_impact_score(data_impact):
     plt.xlabel('age')
     plt.ylabel('impact_score')
     plt.title('relationship between age and impact_score')
+    plt.text(0.05, 0.95,  f'Pearson correlation: {correlation:.2f}',
+             transform=plt.gca().transAxes)
 
     plt.show()
+
+def correlation_age_impact_score(data_impact):
+    correlation = data_impact['age_completed_years'].corr(data_impact['impact_score']).round(2)
+    
+    return correlation
     
     
 
@@ -137,5 +144,6 @@ print('age_average_top10:', age_average)
 print('\n')
 age_table = age_group_build(impact_score)
 print('\n')
+correlation = correlation_age_impact_score(impact_score)
 scatter_plot = scatter_plot_age_impact_score(impact_score)
 
