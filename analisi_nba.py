@@ -97,6 +97,16 @@ def age_group_build(data_impact):
     print(table)
 
     return table
+
+def scatter_plot_age_impact_score(data_impact):
+    scatter = plt.scatter(data_impact['age_completed_years'],
+                           data_impact['impact_score'])
+    plt.xlabel('age')
+    plt.ylabel('impact_score')
+    plt.title('relationship between age and impact_score')
+
+    plt.show()
+    
     
 
 
@@ -126,4 +136,6 @@ age_average = age_average_calc(impact_score)
 print('age_average_top10:', age_average)
 print('\n')
 age_table = age_group_build(impact_score)
+print('\n')
+scatter_plot = scatter_plot_age_impact_score(impact_score)
 
