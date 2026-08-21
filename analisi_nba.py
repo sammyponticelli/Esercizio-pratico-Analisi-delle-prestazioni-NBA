@@ -111,24 +111,10 @@ def scatter_plot_age_impact_score(data_impact):
 
 def correlation_age_impact_score(data_impact):
     correlation = data_impact['age_completed_years'].corr(data_impact['impact_score']).round(2)
-    
+
     return correlation
     
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#main program
 data_set = visualize_dataset(data)   
 print('\n')
 work_dataset = visualize_impact_dataset(data_impact)  
