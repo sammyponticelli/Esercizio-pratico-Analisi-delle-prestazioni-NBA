@@ -98,6 +98,11 @@ def age_group_build(data_impact):
 
     return table
 
+def correlation_age_impact_score(data_impact):
+    correlation = data_impact['age_completed_years'].corr(data_impact['impact_score']).round(2)
+
+    return correlation
+
 def scatter_plot_age_impact_score(data_impact):
     scatter = plt.scatter(data_impact['age_completed_years'],
                            data_impact['impact_score'])
@@ -107,12 +112,14 @@ def scatter_plot_age_impact_score(data_impact):
     plt.text(0.05, 0.95,  f'Pearson correlation: {correlation:.2f}',
              transform=plt.gca().transAxes)
 
+    #linear regression
+    x = data_impact['age_completed_years']
+    y = data_impact['impact_score']
+    coeff = np.polyfit(x, y, 1)
+    retta = np.poly1d(coeff)
+
+    plt.plot(x, retta(x), color='red')
     plt.show()
-
-def correlation_age_impact_score(data_impact):
-    correlation = data_impact['age_completed_years'].corr(data_impact['impact_score']).round(2)
-
-    return correlation
 
     
 #main program
