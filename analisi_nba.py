@@ -3,6 +3,8 @@
 import pandas as pd
 import numpy as np  
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
 
 #variable to store the dataset
 data = pd.read_csv("nba_players_25_26_regular_season_wide_data.csv")
@@ -120,6 +122,27 @@ def scatter_plot_age_impact_score(data_impact):
 
     plt.plot(x, retta(x), color='red')
     plt.show()
+
+def cluster_analysis(data_impact):
+    data_impact = data_impact.copy()
+
+    #standard data
+    X = data_impact[['age_completed_years', 'impact_score']]
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    #k-means
+    KMeans = KMeans(n_clusters=3, random_state=42)
+    data_impact['clusters'] = KMeans.fit_predict(X_scaled)
+
+    #Scatter plot
+    plt.scatter(X, C=clusters)
+    plt.xlabel('age')
+    plt.ylabel('impact_score')
+
+
+
+
 
     
 #main program
