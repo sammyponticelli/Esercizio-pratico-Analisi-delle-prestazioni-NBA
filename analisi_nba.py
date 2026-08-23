@@ -202,6 +202,5 @@ correlation = correlation_age_impact_score(impact_score)
 scatter_plot_age_impact_score(impact_score, correlation)
 cluster_analysis_build(impact_score)
 
-#a single show() at the end, so every figure opens at the same time
 plt.show()
 
