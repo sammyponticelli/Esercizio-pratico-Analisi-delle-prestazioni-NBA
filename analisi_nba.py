@@ -12,7 +12,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 #variable to store the dataset
 data = pd.read_csv("nba_players_25_26_regular_season_wide_data.csv")
-data_impact = data[['player_name', 'age_completed_years', 'team', 'position', 'minutes_played', 'one_point_made', 'two_point_made',
+data_impact = data[['player_name', 'age_completed_years', 'team', 'minutes_played', 'one_point_made', 'two_point_made',
                  'three_point_made', 'offensive_rebounds', 'defensive_rebounds', 'assists','steals', 'blocks',
                    'turnovers', 'wins', 'losses']].copy()
 
@@ -57,14 +57,12 @@ def calculate_per_game(data_impact):
      data_impact['MIN_average'] = (data_impact['minutes_played']/games).round(2)
 
      data_impact.drop(columns = ['one_point_made', 'two_point_made', 'three_point_made', 'wins', 'losses',
-                                    'defensive_rebounds','offensive_rebounds','minutes_played','steals',
+                                    'defensive_rebounds','offensive_rebounds','steals',
                                     'blocks','turnovers','assists','PTS','REB'], inplace=True)
      print(data_impact.head(10))
      return data_impact
 
 def filter_by_games_played(data_impact):
-    #relative floor: 1/3 of the games played by the most-used player in the dataset,
-    #so a partial season works too instead of hard-coding a full-season number
     data_impact = data_impact.copy()
 
     max_games = data_impact['games_played'].max()
@@ -75,47 +73,64 @@ def filter_by_games_played(data_impact):
 
     return filtered
 
-def impact_score_calculator(data_impact):
+def impact_score_40_minutes_calculator(data_impact):
     data_impact = data_impact.copy()
 
     #players with 0 minutes per game become NaN instead of dividing by zero
     minutes = data_impact['MIN_average'].where(data_impact['MIN_average'] > 0)
 
-    data_impact['impact_score'] = ((data_impact['PTS_average'] + 1.2 * data_impact['REB_average'] + 1.5 *
+    data_impact['impact_score_40'] = ((data_impact['PTS_average'] + 1.2 * data_impact['REB_average'] + 1.5 *
                                    data_impact['AST_average'] + 2 * data_impact['STL_average'] + 2 *
                                    data_impact['BLK_average'] - data_impact['TOV_average'])
                                    /minutes*40).round(2)
 
+    #minutes_played stays: the correlation and the plots below are built on it
     data_impact.drop(columns = ['PTS_average', 'AST_average', 'BLK_average', 'REB_average',
                                 'STL_average','TOV_average','MIN_average','games_played'], inplace=True)
     
-    data_impact =  data_impact.sort_values(by='impact_score', ascending=False)
+    data_impact =  data_impact.sort_values(by='impact_score_40', ascending=False)
 
     print(data_impact.head(10))
     return data_impact
 
-def average_top10_calc(data_impact):
+def impact_score_game(data_impact):
+     data_impact = data_impact.copy()
+
+     data_impact['impact_score_game'] = (data_impact['PTS_average'] + 1.2 * data_impact['REB_average'] + 1.5 *
+                                   data_impact['AST_average'] + 2 * data_impact['STL_average'] + 2 *
+                                   data_impact['BLK_average'] - data_impact['TOV_average']).round(2)
+
+     data_impact.drop(columns = ['PTS_average', 'AST_average', 'BLK_average', 'REB_average',
+                                     'STL_average','TOV_average','MIN_average','games_played'], inplace=True)
+         
+
+     data_impact =  data_impact.sort_values(by='impact_score_game', ascending=False)
+
+     print(data_impact.head(10))
+     return data_impact
+
+def average_top10_40_calc(data_impact):
     data_impact = data_impact.copy()
-    data_impact =  data_impact.sort_values(by='impact_score', ascending=False)
-    average_top10 = data_impact['impact_score'].head(10).mean().round(2)
+    data_impact =  data_impact.sort_values(by='impact_score_40', ascending=False)
+    average_top10 = data_impact['impact_score_40'].head(10).mean().round(2)
 
     return average_top10
 
-def age_average_calc(data_impact):
+def age_average_40_calc(data_impact):
     data_impact = data_impact.copy()
-    data_impact =  data_impact.sort_values(by='impact_score', ascending=False)
+    data_impact =  data_impact.sort_values(by='impact_score_40', ascending=False)
     age_average = data_impact['age_completed_years'].head(10).mean()
 
     return age_average
 
-def age_group_build(data_impact):
+def age_group_40_build(data_impact):
     data_impact = data_impact.copy()
     
     data_impact['age_group'] = pd.cut(data_impact['age_completed_years'],
                                        bins=[18, 22, 26, 30, 34, np.inf],
                                        labels=['19-22','23-26','27-30','31-34','35+'])
     grouped = data_impact.groupby('age_group', observed=True)
-    table = grouped['impact_score'].agg(['count','mean','max']).round(2).T
+    table = grouped['impact_score_40'].agg(['count','mean','max']).round(2).T
     table = table.rename(index={'count':'players_number',
                                    'mean':'average_impact_score',
                                    'max':'max_impact_score'})
@@ -124,28 +139,72 @@ def age_group_build(data_impact):
 
     return table
 
-def correlation_age_impact_score(data_impact):
-    correlation = data_impact['age_completed_years'].corr(data_impact['impact_score']).round(2)
+def average_top10_game_calc(data_impact):
+    data_impact = data_impact.copy()
+    data_impact =  data_impact.sort_values(by='impact_score_game', ascending=False)
+    average_top10_game = data_impact['impact_score_game'].head(10).mean().round(2)
+
+    return average_top10_game
+
+def age_average_game_calc(data_impact):
+    data_impact = data_impact.copy()
+    data_impact =  data_impact.sort_values(by='impact_score_game', ascending=False)
+    age_average_game = data_impact['age_completed_years'].head(10).mean()
+
+    return age_average_game
+
+def age_group_game_build(data_impact):
+    data_impact = data_impact.copy()
+    
+    data_impact['age_group'] = pd.cut(data_impact['age_completed_years'],
+                                       bins=[18, 22, 26, 30, 34, np.inf],
+                                       labels=['19-22','23-26','27-30','31-34','35+'])
+    grouped = data_impact.groupby('age_group', observed=True)
+    table = grouped['impact_score_game'].agg(['count','mean','max']).round(2).T
+    table = table.rename(index={'count':'players_number',
+                                   'mean':'average_impact_score',
+                                   'max':'max_impact_score'})
+
+    print(table)
+
+    return table
+
+def correlation_minutes_impact_score_game(data_impact):
+    correlation = data_impact['minutes_played'].corr(data_impact['impact_score_game']).round(2)
+    
+    return correlation
+
+def correlation_minutes_impact_score_40(data_impact):
+    correlation = data_impact['minutes_played'].corr(data_impact['impact_score_40']).round(2)
+    
+    return correlation
+
+
+def correlation_analysis(data_impact_game, data_impact):
+    
+    correlation = {'corr_minutes_game': correlation_minutes_impact_score_game(data_impact_game),
+                   'corr_minutes_40': correlation_minutes_impact_score_40(data_impact)
+                   }
 
     return correlation
 
-def scatter_plot_age_impact_score(data_impact, correlation):
+def scatter_plot_minutes_impact_score_game(data_impact_game, correlation):
     #polyfit returns NaN coefficients if any row is incomplete, so drop them first
-    data_impact = data_impact.dropna(subset=['age_completed_years','impact_score'])
+    data_impact_game = data_impact_game.dropna(subset=['minutes_played','impact_score_game'])
 
     #own figure, so this plot doesn't share axes with the cluster one
     plt.figure()
-    plt.scatter(data_impact['age_completed_years'],
-                 data_impact['impact_score'])
-    plt.xlabel('age')
-    plt.ylabel('impact_score')
-    plt.title('relationship between age and impact_score')
+    plt.scatter(data_impact_game['minutes_played'],
+                 data_impact_game['impact_score_game'])
+    plt.xlabel('minutes_played')
+    plt.ylabel('impact_score_game')
+    plt.title('relationship between minutes_played and impact_score_game')
     plt.text(0.05, 0.95,  f'Pearson correlation: {correlation:.2f}',
              transform=plt.gca().transAxes)
 
     #linear regression
-    x = data_impact['age_completed_years']
-    y = data_impact['impact_score']
+    x = data_impact_game['minutes_played']
+    y = data_impact_game['impact_score_game']
     coeff = np.polyfit(x, y, 1)
     retta = np.poly1d(coeff)
 
@@ -153,12 +212,58 @@ def scatter_plot_age_impact_score(data_impact, correlation):
     x_line = np.sort(x.unique())
     plt.plot(x_line, retta(x_line), color='red')
 
-def cluster_analysis_build(data_impact):
+def scatter_plot_minutes_impact_score_40(data_impact, correlation):
+    #polyfit returns NaN coefficients if any row is incomplete, so drop them first
+    data_impact = data_impact.dropna(subset=['minutes_played','impact_score_40'])
+
+    #own figure, so this plot doesn't share axes with the cluster one
+    plt.figure()
+    plt.scatter(data_impact['minutes_played'],
+                 data_impact['impact_score_40'])
+    plt.xlabel('minutes_played')
+    plt.ylabel('impact_score_40')
+    plt.title('relationship between minutes_played and impact_score_40')
+    plt.text(0.05, 0.95,  f'Pearson correlation: {correlation:.2f}',
+             transform=plt.gca().transAxes)
+
+    #linear regression
+    x = data_impact['minutes_played']
+    y = data_impact['impact_score_40']
+    coeff = np.polyfit(x, y, 1)
+    retta = np.poly1d(coeff)
+
+    #sorted x, otherwise plot retraces the line back and forth
+    x_line = np.sort(x.unique())
+    plt.plot(x_line, retta(x_line), color='red')
+
+def cluster_analysis_minutes_impact_score_game(data_impact_game):
     #KMeans can't handle NaN, so drop the incomplete rows before scaling
-    data_impact = data_impact.dropna(subset=['age_completed_years','impact_score']).copy()
+    data_impact_game = data_impact_game.dropna(subset=['minutes_played','impact_score_game']).copy()
 
     #standard data
-    X = data_impact[['age_completed_years', 'impact_score']]
+    X = data_impact_game[['minutes_played', 'impact_score_game']]
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    #k-means: 3 clusters, best silhouette score on this dataset
+    kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+    data_impact_game['clusters'] = kmeans.fit_predict(X_scaled)
+
+    #Scatter plot, own figure so it doesn't share axes with the other one
+    plt.figure()
+    plt.scatter(data_impact_game['minutes_played'],
+                 data_impact_game['impact_score_game'],
+                 c=data_impact_game['clusters'])
+    plt.title('Cluster analysis: minutes_played and impact_score_game')
+    plt.xlabel('minutes_played')
+    plt.ylabel('impact_score_game')
+
+def cluster_analysis_minutes_impact_score_40(data_impact):
+    #KMeans can't handle NaN, so drop the incomplete rows before scaling
+    data_impact = data_impact.dropna(subset=['minutes_played','impact_score_40']).copy()
+
+    #standard data
+    X = data_impact[['minutes_played', 'impact_score_40']]
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
 
@@ -168,13 +273,12 @@ def cluster_analysis_build(data_impact):
 
     #Scatter plot, own figure so it doesn't share axes with the other one
     plt.figure()
-    plt.scatter(data_impact['age_completed_years'],
-                 data_impact['impact_score'],
+    plt.scatter(data_impact['minutes_played'],
+                 data_impact['impact_score_40'],
                  c=data_impact['clusters'])
-    plt.title('Cluster analysis: age and impact score')
-    plt.xlabel('age')
-    plt.ylabel('impact_score')
-
+    plt.title('Cluster analysis: minutes_played and impact_score_40')
+    plt.xlabel('minutes_played')
+    plt.ylabel('impact_score_40')
 
 
 
@@ -189,18 +293,30 @@ average_dataset = calculate_per_game(data_impact)
 print('\n')
 qualified_dataset = filter_by_games_played(average_dataset)
 print('\n')
-impact_score = impact_score_calculator(qualified_dataset)
+impact_score_40 = impact_score_40_minutes_calculator(qualified_dataset)
 print('\n')
-average_top10 = average_top10_calc(impact_score)
-print('average_top10:', average_top10)
-age_average = age_average_calc(impact_score)
-print('age_average_top10:', age_average)
+average_top10_40 = average_top10_40_calc(impact_score_40)
+print('average_top10_40:', average_top10_40)
+age_average_top10_40 = age_average_40_calc(impact_score_40)
+print('age_average_top10_40:', age_average_top10_40)
 print('\n')
-age_table = age_group_build(impact_score)
+age_table_40 = age_group_40_build(impact_score_40)
 print('\n')
-correlation = correlation_age_impact_score(impact_score)
-scatter_plot_age_impact_score(impact_score, correlation)
-cluster_analysis_build(impact_score)
+data_impact_game = impact_score_game(qualified_dataset)
+print('\n')
+average_top10_game = average_top10_game_calc(data_impact_game)
+print('average_top10_game:', average_top10_game)
+age_average_top10_game = age_average_game_calc(data_impact_game)
+print('age_average_top10_game:', age_average_top10_game)
+print('\n')
+age_table_game = age_group_game_build(data_impact_game)
+print('\n')
+correlation = correlation_analysis(data_impact_game, impact_score_40)
+print(correlation)
+scatter_plot_minutes_impact_score_game(data_impact_game, correlation['corr_minutes_game'])
+cluster_analysis_minutes_impact_score_game(data_impact_game)
+scatter_plot_minutes_impact_score_40(impact_score_40, correlation['corr_minutes_40'])
+cluster_analysis_minutes_impact_score_40(impact_score_40)
 
 plt.show()
 
