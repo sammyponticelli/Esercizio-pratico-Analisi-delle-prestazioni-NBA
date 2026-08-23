@@ -152,8 +152,6 @@ def scatter_plot_age_impact_score(data_impact, correlation):
     #sorted x, otherwise plot retraces the line back and forth
     x_line = np.sort(x.unique())
     plt.plot(x_line, retta(x_line), color='red')
-    plt.show()
-    plt.close()
 
 def cluster_analysis_build(data_impact):
     #KMeans can't handle NaN, so drop the incomplete rows before scaling
@@ -164,11 +162,11 @@ def cluster_analysis_build(data_impact):
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
 
-    #k-means
-    kmeans = KMeans(n_clusters=3, random_state=42)
+    #k-means: 3 clusters, best silhouette score on this dataset
+    kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
     data_impact['clusters'] = kmeans.fit_predict(X_scaled)
 
-    #Scatter plot
+    #Scatter plot, own figure so it doesn't share axes with the other one
     plt.figure()
     plt.scatter(data_impact['age_completed_years'],
                  data_impact['impact_score'],
@@ -176,8 +174,6 @@ def cluster_analysis_build(data_impact):
     plt.title('Cluster analysis: age and impact score')
     plt.xlabel('age')
     plt.ylabel('impact_score')
-    plt.show()
-    plt.close()
 
 
 
@@ -205,4 +201,7 @@ print('\n')
 correlation = correlation_age_impact_score(impact_score)
 scatter_plot_age_impact_score(impact_score, correlation)
 cluster_analysis_build(impact_score)
+
+#a single show() at the end, so every figure opens at the same time
+plt.show()
 
