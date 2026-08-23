@@ -57,11 +57,29 @@ def calculate_per_game(data_impact):
      print(data_impact.head(10))
      return data_impact
 
+def filter_by_games_played(data_impact):
+    #relative floor: 1/3 of the games played by the most-used player in the dataset,
+    #so a partial season works too instead of hard-coding a full-season number
+    data_impact = data_impact.copy()
+
+    max_games = data_impact['games_played'].max()
+    min_games = max_games / 3
+    filtered = data_impact[data_impact['games_played'] >= min_games]
+
+    print(f'games floor: {min_games:.1f} (1/3 of {max_games:.0f}) - kept {len(filtered)} of {len(data_impact)} players')
+
+    return filtered
+
 def impact_score_calculator(data_impact):
     data_impact = data_impact.copy()
-    data_impact['impact_score'] = (data_impact['PTS_average'] + 1.2 * data_impact['REB_average'] + 1.5 * 
-                                   data_impact['AST_average'] + 2 * data_impact['STL_average'] + 2 * 
-                                   data_impact['BLK_average'] - data_impact['TOV_average']).round(2)
+
+    #players with 0 minutes per game become NaN instead of dividing by zero
+    minutes = data_impact['MIN_average'].where(data_impact['MIN_average'] > 0)
+
+    data_impact['impact_score'] = ((data_impact['PTS_average'] + 1.2 * data_impact['REB_average'] + 1.5 *
+                                   data_impact['AST_average'] + 2 * data_impact['STL_average'] + 2 *
+                                   data_impact['BLK_average'] - data_impact['TOV_average'])
+                                   /minutes*40).round(2)
 
     data_impact.drop(columns = ['PTS_average', 'AST_average', 'BLK_average', 'REB_average',
                                 'STL_average','TOV_average','MIN_average','games_played'], inplace=True)
@@ -152,7 +170,9 @@ work_dataset = visualize_impact_dataset(data_impact)
 print('\n')
 average_dataset = calculate_per_game(data_impact)
 print('\n')
-impact_score = impact_score_calculator(average_dataset)
+qualified_dataset = filter_by_games_played(average_dataset)
+print('\n')
+impact_score = impact_score_calculator(qualified_dataset)
 print('\n')
 average_top10 = average_top10_calc(impact_score)
 print('average_top10:', average_top10)
