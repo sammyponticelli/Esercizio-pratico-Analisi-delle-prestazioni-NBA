@@ -25,12 +25,12 @@ Variabili principali utilizzate nell'analisi:
 | `offensive_rebounds`, `defensive_rebounds` | Rimbalzi offensivi e difensivi |
 | `assists`, `steals`, `blocks`, `turnovers` | Assist, palle rubate, stoppate, palle perse |
 | `wins`, `losses` | Vittorie e sconfitte (usate per derivare le partite giocate) |
+| `position` | Ruolo (G / F / C e combinazioni) — non entra nella formula, ma è la variabile di raggruppamento della fase 8 |
 
 Variabili presenti nel dataset ma **non** utilizzate nel calcolo dell'Impact Score (utili per la ricerca di correlazioni della fase 6):
 
 | Variabile | Descrizione |
 |---|---|
-| `position` | Ruolo (G / F / C e combinazioni) — sarà reintrodotto nella fase 8 |
 | `height_m`, `weight_kg` | Altezza e peso |
 | `experience` | Anni di esperienza in NBA |
 | `country` | Nazionalità |
@@ -110,10 +110,26 @@ Il confronto tra le due correlazioni è di per sé un risultato dell'analisi:
 La correlazione forte sul punteggio per partita conferma che la produzione complessiva dipende in larga misura dal minutaggio; la normalizzazione per 40 minuti ne rimuove buona parte, pur lasciando una correlazione positiva residua — segno che gli allenatori tendono comunque a concedere più minuti ai giocatori più efficienti.
 
 ### 7. Confronto tra i giocatori
-Confronto dei giocatori della Top 10 attraverso le principali statistiche individuali, con tabella comparativa e visualizzazione degli Impact Score.
+Confronto dei giocatori della Top 10 attraverso le principali statistiche individuali (`PTS`, `REB`, `AST`, `STL`, `BLK`, `TOV`, `MIN` medi per partita), con una tabella comparativa per ciascuna versione dell'indicatore e due **bar chart** delle rispettive Top 10.
+
+Tabelle e grafici sono costruiti sul dataset **filtrato** dalla fase 3, quindi le classifiche coincidono con quelle della fase 4. Le due tabelle sono indipendenti l'una dall'altra: ciascuna lavora su una propria copia del dataset filtrato.
 
 ### 8. Analisi dell'Impact Score per ruolo
-Analisi dell'Impact Score medio in relazione al ruolo (`position`), per individuare eventuali differenze di impatto tra i diversi ruoli.
+Impact Score medio raggruppato per ruolo (`position`), calcolato su entrambe le versioni dell'indicatore, con **bar chart affiancato** che mette a confronto le due medie ruolo per ruolo (ruoli ordinati lungo il continuum guardia → centro: `G`, `G-F`, `F-G`, `F`, `F-C`, `C-F`, `C`).
+
+Risultati:
+
+| Ruolo | Impact Score per partita | Impact Score per 40 minuti |
+|---|---|---|
+| `G` | 19.74 | 33.96 |
+| `G-F` | 20.61 | 33.27 |
+| `F-G` | **28.54** | 38.49 |
+| `F` | 18.63 | 34.18 |
+| `F-C` | 21.87 | 38.84 |
+| `C-F` | 24.45 | **41.72** |
+| `C` | 22.21 | 40.44 |
+
+Il confronto tra le due colonne cambia la lettura: per partita il valore più alto è quello degli `F-G`, ma si tratta di un gruppo poco numeroso e trainato dai minutaggi elevati dei suoi giocatori di punta; una volta normalizzato per 40 minuti l'impatto si sposta stabilmente verso i ruoli interni (`C-F`, `C`, `F-C`), coerentemente con il peso che la formula assegna a rimbalzi e stoppate.
 
 ### 9. Conclusioni
 I risultati vengono utilizzati per determinare:
@@ -137,8 +153,8 @@ I risultati vengono utilizzati per determinare:
 | 4. Analisi della Top 10 | ✅ implementata — su entrambe le versioni |
 | 5. Analisi per fascia d'età | ✅ implementata — su entrambe le versioni |
 | 6. Ricerca correlazioni significative | 🟡 parziale — correlazione minuti/impact, scatter con regressione e cluster analysis implementati per entrambe le versioni; correlazioni con altre variabili da implementare |
-| 7. Confronto tra i giocatori | 🔜 da implementare |
-| 8. Impact Score per ruolo | 🔜 da implementare |
+| 7. Confronto tra i giocatori | ✅ implementata — tabelle comparative e bar chart delle Top 10, su entrambe le versioni |
+| 8. Impact Score per ruolo | ✅ implementata — medie per ruolo e bar chart di confronto tra le due versioni |
 | 9. Conclusioni | 🔜 da implementare |
 
 ---
@@ -149,6 +165,7 @@ I risultati vengono utilizzati per determinare:
 nba_analysis_exercise/
 ├── analisi_nba.py                                    # script di analisi
 ├── nba_players_25_26_regular_season_wide_data.csv    # dataset
+├── .gitignore
 └── README.md
 ```
 
@@ -169,6 +186,10 @@ nba_analysis_exercise/
 | `correlation_analysis(data_impact_game, data_impact)` | Raccoglie le due correlazioni in un dizionario |
 | `scatter_plot_minutes_impact_score_40` / `..._game` | Scatter plot minuti/Impact Score con retta di regressione lineare |
 | `cluster_analysis_minutes_impact_score_40` / `..._game` | Cluster analysis K-Means (3 cluster) su minuti e Impact Score standardizzati |
+| `compare_top10_game` / `compare_top10_40` | Tabella comparativa della Top 10 con le statistiche medie per partita |
+| `bar_chart_top10_40` / `bar_chart_top10_game` | Bar chart della Top 10 per ciascuna versione dell'indicatore |
+| `impact_score_by_position_game` / `..._40` | Impact Score medio per ruolo, ordinato in senso decrescente |
+| `bar_chart_position_comparison(position_game, position_40)` | Bar chart affiancato delle due medie per ruolo, con ruoli ordinati da `G` a `C` |
 
 ---
 
@@ -192,7 +213,17 @@ python analisi_nba.py
 
 Lo script va eseguito dalla cartella del progetto, dove si trova il file CSV.
 
-L'esecuzione stampa a console le tabelle riepilogative e apre **quattro finestre Matplotlib**: scatter plot e cluster analysis per `impact_score_game`, scatter plot e cluster analysis per `impact_score_40`.
+L'esecuzione stampa a console le tabelle riepilogative e apre **sette finestre Matplotlib**:
+
+| # | Grafico |
+|---|---|
+| 1 | Scatter plot minuti / `impact_score_game` con retta di regressione |
+| 2 | Cluster analysis su minuti e `impact_score_game` |
+| 3 | Scatter plot minuti / `impact_score_40` con retta di regressione |
+| 4 | Cluster analysis su minuti e `impact_score_40` |
+| 5 | Bar chart Top 10 per `impact_score_40` |
+| 6 | Bar chart Top 10 per `impact_score_game` |
+| 7 | Bar chart di confronto dell'Impact Score medio per ruolo |
 
 ---
 
