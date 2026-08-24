@@ -86,7 +86,8 @@ Handling of missing values, removal of any duplicates, conversion of the variabl
 
 Choices made:
 - missing values in `wins` / `losses` treated as 0 games played;
-- players with 0 games played excluded from the averages (`NaN` instead of a division by zero).
+- players with 0 games played excluded from the averages (`NaN` instead of a division by zero);
+- hybrid position labels collapsed onto the primary position (`G-F` → `G`, `F-G` and `F-C` → `F`, `C-F` → `C`), so that every table downstream works on three groups instead of seven.
 
 ### 3. Impact Score computation
 Application of the predefined formula, accounting for the different weights assigned to the player statistics. The games played filter is applied before the computation. The result is stored in the two new variables `impact_score_game` and `impact_score_40`.
@@ -117,21 +118,19 @@ The Top 10 players are compared on the main individual statistics (`PTS`, `REB`,
 Tables and charts are built on the dataset **filtered** in phase 3, so the rankings match those of phase 4. The two tables are independent of each other: each works on its own copy of the filtered dataset.
 
 ### 8. Impact Score by position
-Average Impact Score grouped by position (`position`), computed on both versions of the indicator, with a **grouped bar chart** comparing the two averages position by position (positions ordered along the guard → centre continuum: `G`, `G-F`, `F-G`, `F`, `F-C`, `C-F`, `C`).
+Average Impact Score grouped by position, computed on both versions of the indicator, with a **grouped bar chart** comparing the two averages position by position.
+
+Hybrid labels are collapsed onto the primary position (`G-F` → `G`, `F-G` and `F-C` → `F`, `C-F` → `C`). The dataset spreads players over seven labels, three of which hold fewer than 25 of the 419 eligible players — too few for a stable average, and `F-G` held just 9. The three resulting groups hold 204 guards, 155 forwards and 60 centres.
 
 Results:
 
-| Position | Impact Score per game | Impact Score per 40 minutes |
-|---|---|---|
-| `G` | 19.74 | 33.96 |
-| `G-F` | 20.61 | 33.27 |
-| `F-G` | **28.54** | 38.49 |
-| `F` | 18.63 | 34.18 |
-| `F-C` | 21.87 | 38.84 |
-| `C-F` | 24.45 | **41.72** |
-| `C` | 22.21 | 40.44 |
+| Position | Players | Impact Score per game | Impact Score per 40 minutes |
+|---|---|---|---|
+| `G` | 204 | 19.88 | 33.84 |
+| `F` | 155 | 19.67 | 35.09 |
+| `C` | 60 | **22.81** | **40.78** |
 
-Comparing the two columns changes the reading: per game the highest value belongs to the `F-G` group, but it is a small group pulled up by the heavy minutes of its best players; once normalised per 40 minutes the impact shifts steadily towards the interior positions (`C-F`, `C`, `F-C`), consistently with the weight the formula gives to rebounds and blocks.
+Centres lead on both versions. Their margin over the guards widens once playing time is normalised, from about 15% to about 21%, while the margin over the forwards stays around 16%. This follows from the formula, where rebounds are weighted 1.2 and blocks 2 — the two categories where centres accumulate most. Guards and forwards are almost tied per game (19.88 against 19.67) but swap order once normalised (33.84 against 35.09), because guards average about one minute more per game.
 
 ### 9. Conclusions
 The results of the previous phases come together in a **summary table** that puts the two versions of the indicator side by side, one question of the analysis per row:
@@ -143,7 +142,7 @@ The results of the previous phases come together in a **summary table** that put
 | Top 10 average age | 27.5 | 27.7 |
 | Age band with the highest impact | 35+ (26.03) | 35+ (39.09) |
 | Correlation with minutes played | 0.76 | 0.39 |
-| Position with the highest impact | F-G (28.54) | C-F (41.72) |
+| Position with the highest impact | C (22.81) | C (40.78) |
 
 What comes out of it:
 
@@ -152,7 +151,7 @@ What comes out of it:
 - **The average age of the best players is the same in both versions**, just above 27: the performance peak does not move depending on how impact is measured.
 - **The 35+ band has the highest average in both versions, but this is a selection effect.** It is 20 players out of 419: at that age only those who are still very strong stay on the court, while the younger bands also contain every bench player.
 - **The correlation with minutes drops from 0.76 to 0.39.** Per-game production is largely explained by the minutes granted; normalising removes most of that, and what remains suggests coaches do give more room to the more efficient players.
-- **The position with the highest impact changes with the metric.** Per game the `F-G` group stands out, per 40 minutes the interior positions (`C-F`, `C`, `F-C`) do: the clearest confirmation that the two versions of the indicator answer different questions.
+- **Centres have the highest impact on both versions, and normalising widens their lead.** Guards and forwards are separated by 0.21 per game and change order once normalised, so the only stable positional result is the advantage of the interior — which comes straight from the weights the formula puts on rebounds and blocks.
 
 ---
 
@@ -190,7 +189,7 @@ nba_analysis_exercise/
 |---|---|
 | `explore_dataset(raw_data)` | Initial exploration: `head`, data types |
 | `build_season_totals(season_stats)` | View of the season totals with `games_played`, `PTS`, `REB` |
-| `calculate_per_game_averages(season_stats)` | Per-game averages of every statistic |
+| `calculate_per_game_averages(season_stats)` | Per-game averages of every statistic, and the collapse of the hybrid position labels |
 | `filter_by_games_played(per_game_stats)` | Keeps the players with at least 1/3 of the games of the most used one |
 | `calculate_impact_score_40(qualified_players)` | Formula normalised per 40 minutes (`impact_score_40`), sorted descending |
 | `calculate_impact_score_game(qualified_players)` | Formula on the per-game averages (`impact_score_game`), sorted descending |
@@ -204,7 +203,7 @@ nba_analysis_exercise/
 | `build_top10_comparison_game` / `..._40` | Comparison table of the Top 10 with the per-game averages |
 | `plot_top10_bar_chart_40` / `..._game` | Bar chart of the Top 10 for each version of the indicator |
 | `calculate_score_by_position_game` / `..._40` | Average Impact Score by position, sorted descending |
-| `plot_position_comparison(scores_game, scores_40)` | Grouped bar chart of the two averages by position, positions ordered from `G` to `C` |
+| `plot_position_comparison(scores_game, scores_40)` | Grouped bar chart of the two averages by position, ordered `G`, `F`, `C` |
 | `build_conclusions_table(...)` | Final summary table: the six answers of the analysis, per game and per 40 minutes |
 
 Naming convention: functions start with a verb (`calculate_`, `build_`, `plot_`, `filter_`, `explore_`), variables are nouns. Functions that exist in two versions carry the `_game` or `_40` suffix. The DataFrames that flow through the analysis are named `season_stats` (season totals) → `per_game_stats` (per-game averages) → `qualified_players` (after the filter) → `ranking_game` / `ranking_40` (with the Impact Score computed and sorted).

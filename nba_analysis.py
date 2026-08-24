@@ -42,6 +42,9 @@ def build_season_totals(season_stats):
 def calculate_per_game_averages(season_stats):
     per_game = season_stats.copy()
 
+    #hybrid labels collapsed onto the primary position: G-F -> G, F-G and F-C -> F, C-F -> C
+    per_game['position'] = per_game['position'].str[0]
+
     per_game['PTS'] = (per_game['one_point_made']
                        + per_game['two_point_made'] * 2
                        + per_game['three_point_made'] * 3)
@@ -400,7 +403,7 @@ def build_conclusions_table(ranking_40, ranking_game, age_group_table_40, age_gr
     return conclusions
 
 def plot_position_comparison(scores_game, scores_40):
-    position_order = ['G', 'G-F', 'F-G', 'F', 'F-C', 'C-F', 'C']
+    position_order = ['G', 'F', 'C']
 
     scores_game = scores_game.reindex(position_order)
     scores_40 = scores_40.reindex(position_order)

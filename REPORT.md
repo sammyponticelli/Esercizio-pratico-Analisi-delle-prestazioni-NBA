@@ -22,7 +22,7 @@ Main findings:
 2. **The two rankings agree on 8 of 10 names.** The indicator is therefore robust: normalising by playing time reshuffles the order but does not change who the best players are.
 3. **Minutes played explain most of the per-game score, and little of the per-40 score.** The Pearson correlation drops from **0.76** to **0.39** — from about 58% of the variance explained to about 15%.
 4. **Impact rises with age, but this is a selection effect.** The 35+ band has the highest average in both versions (26.03 and 39.09), yet it contains only 20 of the 419 eligible players.
-5. **The position with the highest impact changes with the metric**: `F-G` per game (28.54), `C-F` per 40 minutes (41.72). Normalisation shifts the advantage towards the interior positions, consistently with the weight the formula assigns to rebounds and blocks.
+5. **Centres have the highest impact on both metrics** (22.81 per game, 40.78 per 40 minutes). Their margin over the guards widens from about 15% to about 21% once playing time is normalised — a direct consequence of the weight the formula assigns to rebounds and blocks.
 
 ---
 
@@ -77,14 +77,14 @@ On this dataset the threshold works out at **27.3 games** (1/3 of 82), which kee
 | # | Player | Age | Pos | Team | Impact Score |
 |---|---|---|---|---|---|
 | 1 | Nikola Jokić | 31 | C | DEN | **59.93** |
-| 2 | Luka Dončić | 27 | F-G | LAL | 55.54 |
-| 3 | Victor Wembanyama | 22 | F-C | SAS | 49.26 |
+| 2 | Luka Dončić | 27 | F | LAL | 55.54 |
+| 3 | Victor Wembanyama | 22 | F | SAS | 49.26 |
 | 4 | Shai Gilgeous-Alexander | 27 | G | OKC | 48.26 |
 | 5 | Giannis Antetokounmpo | 31 | F | MIL | 47.51 |
 | 6 | Jalen Johnson | 24 | F | ATL | 46.59 |
 | 7 | Cade Cunningham | 24 | G | DET | 46.32 |
 | 8 | Tyrese Maxey | 25 | G | PHI | 46.00 |
-| 9 | Jaylen Brown | 29 | G-F | BOS | 43.84 |
+| 9 | Jaylen Brown | 29 | G | BOS | 43.84 |
 | 10 | Kawhi Leonard | 35 | F | LAC | 43.46 |
 
 **Top 10 average Impact Score: 48.67 — average age: 27.5 years.**
@@ -100,13 +100,13 @@ The distribution is markedly top-heavy: Jokić stands 4.4 points clear of Donči
 | # | Player | Age | Pos | Team | Impact Score |
 |---|---|---|---|---|---|
 | 1 | Nikola Jokić | 31 | C | DEN | **68.81** |
-| 2 | Victor Wembanyama | 22 | F-C | SAS | 67.60 |
+| 2 | Victor Wembanyama | 22 | F | SAS | 67.60 |
 | 3 | Giannis Antetokounmpo | 31 | F | MIL | 65.82 |
-| 4 | Luka Dončić | 27 | F-G | LAL | 62.12 |
+| 4 | Luka Dončić | 27 | F | LAL | 62.12 |
 | 5 | Shai Gilgeous-Alexander | 27 | G | OKC | 58.11 |
 | 6 | Cade Cunningham | 24 | G | DET | 54.60 |
 | 7 | Kawhi Leonard | 35 | F | LAC | 54.21 |
-| 8 | Joel Embiid | 32 | C-F | PHI | 54.05 |
+| 8 | Joel Embiid | 32 | C | PHI | 54.05 |
 | 9 | Jalen Johnson | 24 | F | ATL | 53.00 |
 | 10 | LaMelo Ball | 24 | G | CHA | 52.35 |
 
@@ -138,14 +138,14 @@ Per-game averages of the ten highest per-game scores:
 | Player | Pos | PTS | REB | AST | STL | BLK | TOV | MIN |
 |---|---|---|---|---|---|---|---|---|
 | Nikola Jokić | C | 27.68 | **12.86** | **10.72** | 1.42 | 0.82 | 3.74 | 34.84 |
-| Luka Dončić | F-G | **33.48** | 7.73 | 8.28 | 1.64 | 0.53 | **3.98** | 35.76 |
-| Victor Wembanyama | F-C | 25.00 | 11.50 | 3.11 | 1.03 | **3.08** | 2.42 | 29.15 |
+| Luka Dončić | F | **33.48** | 7.73 | 8.28 | 1.64 | 0.53 | **3.98** | 35.76 |
+| Victor Wembanyama | F | 25.00 | 11.50 | 3.11 | 1.03 | **3.08** | 2.42 | 29.15 |
 | Shai Gilgeous-Alexander | G | 31.13 | 4.29 | 6.59 | 1.40 | 0.76 | 2.22 | 33.22 |
 | Giannis Antetokounmpo | F | 27.58 | 9.78 | 5.44 | 0.94 | 0.67 | 3.19 | 28.87 |
 | Jalen Johnson | F | 22.51 | 10.28 | 7.86 | 1.24 | 0.43 | 3.39 | 35.16 |
 | Cade Cunningham | G | 23.92 | 5.55 | 9.91 | 1.44 | 0.84 | 3.69 | 33.93 |
 | Tyrese Maxey | G | 28.29 | 4.14 | 6.59 | 1.86 | 0.79 | 2.44 | **38.02** |
-| Jaylen Brown | G-F | 28.70 | 6.93 | 5.13 | 1.01 | 0.38 | 3.65 | 34.41 |
+| Jaylen Brown | G | 28.70 | 6.93 | 5.13 | 1.01 | 0.38 | 3.65 | 34.41 |
 | Kawhi Leonard | F | 27.89 | 6.35 | 3.60 | **1.88** | 0.42 | 2.05 | 32.07 |
 
 Three routes to a high score emerge:
@@ -207,28 +207,23 @@ K-Means with 3 clusters on standardised minutes played and Impact Score. Standar
 
 ### 4.8 Impact by position
 
+The dataset labels players with seven positions, including hybrids such as `G-F` or `C-F`. Three of those groups hold fewer than 25 of the 419 eligible players and `F-G` holds only 9 — too few for an average to mean anything. Positions are therefore **collapsed onto the primary one**, the first label listed: `G-F` → `G`, `F-G` and `F-C` → `F`, `C-F` → `C`. The collapse is applied during data preparation, so every table in this report uses the three-way label.
+
 | Position | Players | Avg minutes | Impact per game | Impact per 40 min |
 |---|---|---|---|---|
-| `G` | 170 | 22.31 | 19.74 | 33.96 |
-| `G-F` | 34 | 23.84 | 20.61 | 33.27 |
-| `F-G` | 9 | **28.93** | **28.54** | 38.49 |
-| `F` | 124 | 20.98 | 18.63 | 34.18 |
-| `F-C` | 22 | 21.69 | 21.87 | 38.84 |
-| `C-F` | 16 | 22.90 | 24.45 | **41.72** |
-| `C` | 44 | 21.16 | 22.21 | 40.44 |
+| `G` | 204 | 22.57 | 19.88 | 33.84 |
+| `F` | 155 | 21.54 | 19.67 | 35.09 |
+| `C` | 60 | 21.62 | **22.81** | **40.78** |
 
 ![Average Impact Score by position](charts/07-impact-score-by-position.png)
 
 *Figure 7 — Average Impact Score by position, per game (blue) and per 40 minutes (orange). Positions are ordered along the guard → centre continuum.*
 
-**How to read it.** The two series tell different stories. On the per-game series the peak is the `F-G` group, an isolated spike in the middle of the chart. On the per-40 series the pattern is monotone: it rises from left to right, from the guards to the interior positions, peaking at `C-F` and `C`.
+**How to read it.** Both series peak at the centres, and the orange series peaks harder. The effect is specific to the comparison with the guards: the centres' margin over `G` goes from 14.7% per game to 20.5% per 40 minutes, while their margin over `F` barely moves (16.0% to 16.2%). Centres average slightly fewer minutes than guards (21.62 against 22.57) and about the same as forwards, so removing playing time from the measure only works in their favour against the group that plays more.
 
-The `F-G` spike deserves scrutiny, because it is the one result that does not survive normalisation. Two facts explain it:
+This is the expected result given the formula: rebounds are weighted 1.2 and blocks 2, and both are categories where centres accumulate most. Wembanyama's 3.08 blocks per game, worth 6.16 points of Impact Score on their own, are the individual illustration of a positional effect.
 
-- The group has only **9 players**, so it is highly sensitive to individual cases — Dončić alone scores 55.54. Removing him, however, still leaves the group at 25.16, ahead of every other position, so this is not a single-player artefact.
-- The group averages **28.93 minutes**, roughly 5 to 8 more than every other position group. `F-G` is not a playing style so much as a label that in this dataset attaches to high-usage wings.
-
-Per 40 minutes, with that advantage removed, `F-G` drops to fourth (38.49) and the ranking becomes coherent: the interior positions lead, which follows directly from the formula, where rebounds are weighted 1.2 and blocks 2 — the two categories where centres accumulate most.
+Guards and forwards are, for practical purposes, indistinguishable: 0.21 apart per game, and they swap order once normalised (33.84 against 35.09). The reason is the same one that runs through the whole analysis — guards average about one minute more per game, which is enough to put them marginally ahead on a volume measure and marginally behind on a rate measure. **The only robust positional conclusion is the advantage of the interior.**
 
 ---
 
@@ -241,13 +236,13 @@ Per 40 minutes, with that advantage removed, `F-G` drops to fourth (38.49) and t
 | Top 10 average age | 27.5 | 27.7 |
 | Age band with the highest impact | 35+ (26.03) | 35+ (39.09) |
 | Correlation with minutes played | 0.76 | 0.39 |
-| Position with the highest impact | F-G (28.54) | C-F (41.72) |
+| Position with the highest impact | C (22.81) | C (40.78) |
 
 1. **Jokić is the most impactful player of the season on this metric, on both readings.** Leading a volume-based indicator and an efficiency-based one at the same time is the strongest result the analysis produces: his advantage does not depend on how long he is on the court.
 2. **The indicator is stable where it matters.** Eight of the ten names are common to both rankings; normalisation reorders the top but does not replace it.
 3. **Playing time is the main confounder of any per-game measure**, and quantifiably so: it accounts for roughly 58% of the variance of the per-game score against 15% of the per-40 score. Any ranking based on per-game totals is in large part a ranking of who the coach trusts.
 4. **The age result is a trap worth naming.** The 35+ band leads both averages, but on 20 players who are on rosters precisely because they are still good. Peak individual performance, read from the maxima, sits in the 27–34 range.
-5. **Positional conclusions depend entirely on the metric chosen.** The same dataset says `F-G` or `C-F` depending on whether playing time is normalised — which is the clearest demonstration that the two versions of the indicator answer two different questions, and that reporting only one of them would be misleading.
+5. **Centres have the highest impact, and it is the one positional result that holds on both metrics.** Guards and forwards are 0.21 apart per game and change order when normalised, so no meaningful difference separates them. The centres' advantage, by contrast, is present in both versions and widens under normalisation — although it should be read as a property of the formula's weights as much as of the players: an indicator that rewards rebounds and blocks will favour the positions that produce them.
 
 ---
 
