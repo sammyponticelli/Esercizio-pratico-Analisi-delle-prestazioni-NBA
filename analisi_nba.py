@@ -12,7 +12,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 #variable to store the dataset
 data = pd.read_csv("nba_players_25_26_regular_season_wide_data.csv")
-data_impact = data[['player_name', 'age_completed_years', 'team', 'minutes_played', 'one_point_made', 'two_point_made',
+data_impact = data[['player_name', 'age_completed_years','position', 'team', 'minutes_played', 'one_point_made', 'two_point_made',
                  'three_point_made', 'offensive_rebounds', 'defensive_rebounds', 'assists','steals', 'blocks',
                    'turnovers', 'wins', 'losses']].copy()
 
@@ -59,7 +59,8 @@ def calculate_per_game(data_impact):
      data_impact.drop(columns = ['one_point_made', 'two_point_made', 'three_point_made', 'wins', 'losses',
                                     'defensive_rebounds','offensive_rebounds','steals',
                                     'blocks','turnovers','assists','PTS','REB'], inplace=True)
-     print(data_impact.head(10))
+     #minutes_played stays in the dataset for the correlation and the plots, it's just hidden from the table
+     print(data_impact.drop(columns='minutes_played').head(10))
      return data_impact
 
 def filter_by_games_played(data_impact):
@@ -87,10 +88,10 @@ def impact_score_40_minutes_calculator(data_impact):
     #minutes_played stays: the correlation and the plots below are built on it
     data_impact.drop(columns = ['PTS_average', 'AST_average', 'BLK_average', 'REB_average',
                                 'STL_average','TOV_average','MIN_average','games_played'], inplace=True)
-    
+
     data_impact =  data_impact.sort_values(by='impact_score_40', ascending=False)
 
-    print(data_impact.head(10))
+    print(data_impact.drop(columns='minutes_played').head(10))
     return data_impact
 
 def impact_score_game(data_impact):
@@ -100,13 +101,13 @@ def impact_score_game(data_impact):
                                    data_impact['AST_average'] + 2 * data_impact['STL_average'] + 2 *
                                    data_impact['BLK_average'] - data_impact['TOV_average']).round(2)
 
+     #minutes_played stays: the correlation and the plots below are built on it
      data_impact.drop(columns = ['PTS_average', 'AST_average', 'BLK_average', 'REB_average',
                                      'STL_average','TOV_average','MIN_average','games_played'], inplace=True)
-         
 
      data_impact =  data_impact.sort_values(by='impact_score_game', ascending=False)
 
-     print(data_impact.head(10))
+     print(data_impact.drop(columns='minutes_played').head(10))
      return data_impact
 
 def average_top10_40_calc(data_impact):
