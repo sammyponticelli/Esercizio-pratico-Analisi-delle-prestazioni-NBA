@@ -280,6 +280,28 @@ def cluster_analysis_minutes_impact_score_40(data_impact):
     plt.xlabel('minutes_played')
     plt.ylabel('impact_score_40')
 
+def compare_top10_game_and_40(average_dataset):
+    #players with 0 minutes per game become NaN instead of dividing by zero
+    minutes = average_dataset['MIN_average'].where(average_dataset['MIN_average'] > 0)
+    
+    average_dataset['impact_score_game'] = (average_dataset['PTS_average'] + 1.2 * average_dataset['REB_average'] + 1.5 *
+                                   average_dataset['AST_average'] + 2 * average_dataset['STL_average'] + 2 *
+                                   average_dataset['BLK_average'] - average_dataset['TOV_average']).round(2)
+    
+    average_dataset['impact_score_40'] = ((average_dataset['PTS_average'] + 1.2 * average_dataset['REB_average'] + 1.5 *
+                                   average_dataset['AST_average'] + 2 * average_dataset['STL_average'] + 2 *
+                                   average_dataset['BLK_average'] - average_dataset['TOV_average'])
+                                   /minutes*40).round(2)
+    
+    average_dataset = average_dataset.rename(columns = {'age_completed_years':'age'})
+
+    average_dataset =  average_dataset.sort_values(by='impact_score_40', ascending=False)
+    average_dataset =  average_dataset.sort_values(by='impact_score_game', ascending=False)
+        
+    
+    print(average_dataset.head(10))
+    return average_dataset
+
 
 
 
@@ -317,6 +339,8 @@ scatter_plot_minutes_impact_score_game(data_impact_game, correlation['corr_minut
 cluster_analysis_minutes_impact_score_game(data_impact_game)
 scatter_plot_minutes_impact_score_40(impact_score_40, correlation['corr_minutes_40'])
 cluster_analysis_minutes_impact_score_40(impact_score_40)
+print('\n')
+compare_top10 = compare_top10_game_and_40(average_dataset)
 
 plt.show()
 
