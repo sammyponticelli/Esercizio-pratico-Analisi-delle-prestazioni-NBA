@@ -289,10 +289,8 @@ def compare_top10_game(average_dataset):
                                    average_dataset['BLK_average'] - average_dataset['TOV_average']).round(2)
     
     average_dataset.drop(columns = ['age_completed_years', 'team','minutes_played','games_played'], inplace = True)
-
     average_dataset =  average_dataset.sort_values(by='impact_score_game', ascending=False)
         
-    
     print(average_dataset.head(10))
     return average_dataset
 
@@ -306,13 +304,34 @@ def compare_top10_40(average_dataset):
                                        /minutes*40).round(2)
     
     average_dataset.drop(columns = ['impact_score_game'], inplace = True)
-
     average_dataset =  average_dataset.sort_values(by='impact_score_40', ascending=False)
         
-    
     print(average_dataset.head(10))
     return average_dataset
 
+def bar_chart_top10_40(data_impact):
+    top10 = data_impact.sort_values(by='impact_score_40', ascending=False).head(10)
+
+    plt.figure()
+    plt.bar(top10['player_name'], top10['impact_score_40'])
+    plt.xlabel('player')
+    plt.ylabel('impact score 40')
+    plt.title('Top 10 players by Impact Score per 40 minutes')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.subplots_adjust(bottom=0.27)
+
+def bar_chart_top10_game(data_impact):
+    top10 = data_impact.sort_values(by='impact_score_game', ascending=False).head(10)
+
+    plt.figure()
+    plt.bar(top10['player_name'], top10['impact_score_game'])
+    plt.xlabel('player')
+    plt.ylabel('impact score game')
+    plt.title('Top 10 players by Impact Score per game')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    plt.subplots_adjust(bottom=0.27)
 
 
 
@@ -354,6 +373,8 @@ print('\n')
 compare_top10_game(average_dataset)
 print('\n')
 compare_top10_40(average_dataset)
+bar_chart_top10_40(impact_score_40)
+bar_chart_top10_game(data_impact_game)
 
 plt.show()
 
