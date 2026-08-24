@@ -173,29 +173,31 @@ nba_analysis_exercise/
 
 | Funzione | Descrizione |
 |---|---|
-| `visualize_dataset(data)` | Esplorazione iniziale: `head`, tipi di dato |
-| `visualize_impact_dataset(data_impact)` | Costruzione del dataset di lavoro con `games_played`, `PTS`, `REB` |
-| `calculate_per_game(data_impact)` | Calcolo delle medie per partita di tutte le statistiche |
-| `filter_by_games_played(data_impact)` | Filtro sui giocatori con almeno 1/3 delle partite del più utilizzato |
-| `impact_score_40_minutes_calculator(data_impact)` | Formula con normalizzazione per 40 minuti (`impact_score_40`) e ordinamento decrescente |
-| `impact_score_game(data_impact)` | Formula sulle medie per partita (`impact_score_game`) e ordinamento decrescente |
-| `average_top10_40_calc` / `average_top10_game_calc` | Impact Score medio della Top 10, per ciascuna versione |
-| `age_average_40_calc` / `age_average_game_calc` | Età media della Top 10, per ciascuna versione |
-| `age_group_40_build` / `age_group_game_build` | Tabella riepilogativa per fascia d'età (numero giocatori, media, massimo) |
-| `correlation_minutes_impact_score_40` / `..._game` | Coefficiente di correlazione di Pearson tra minuti giocati e Impact Score |
-| `correlation_analysis(data_impact_game, data_impact)` | Raccoglie le due correlazioni in un dizionario |
-| `scatter_plot_minutes_impact_score_40` / `..._game` | Scatter plot minuti/Impact Score con retta di regressione lineare |
-| `cluster_analysis_minutes_impact_score_40` / `..._game` | Cluster analysis K-Means (3 cluster) su minuti e Impact Score standardizzati |
-| `compare_top10_game` / `compare_top10_40` | Tabella comparativa della Top 10 con le statistiche medie per partita |
-| `bar_chart_top10_40` / `bar_chart_top10_game` | Bar chart della Top 10 per ciascuna versione dell'indicatore |
-| `impact_score_by_position_game` / `..._40` | Impact Score medio per ruolo, ordinato in senso decrescente |
-| `bar_chart_position_comparison(position_game, position_40)` | Bar chart affiancato delle due medie per ruolo, con ruoli ordinati da `G` a `C` |
+| `explore_dataset(raw_data)` | Esplorazione iniziale: `head`, tipi di dato |
+| `build_season_totals(season_stats)` | Vista dei totali di stagione con `games_played`, `PTS`, `REB` |
+| `calculate_per_game_averages(season_stats)` | Calcolo delle medie per partita di tutte le statistiche |
+| `filter_by_games_played(per_game_stats)` | Filtro sui giocatori con almeno 1/3 delle partite del più utilizzato |
+| `calculate_impact_score_40(qualified_players)` | Formula con normalizzazione per 40 minuti (`impact_score_40`) e ordinamento decrescente |
+| `calculate_impact_score_game(qualified_players)` | Formula sulle medie per partita (`impact_score_game`) e ordinamento decrescente |
+| `calculate_top10_average_score_40` / `..._game` | Impact Score medio della Top 10, per ciascuna versione |
+| `calculate_top10_average_age_40` / `..._game` | Età media della Top 10, per ciascuna versione |
+| `build_age_group_table_40` / `..._game` | Tabella riepilogativa per fascia d'età (numero giocatori, media, massimo) |
+| `calculate_minutes_correlation_40` / `..._game` | Coefficiente di correlazione di Pearson tra minuti giocati e Impact Score |
+| `collect_correlations(ranking_game, ranking_40)` | Raccoglie le due correlazioni in un dizionario |
+| `plot_minutes_vs_score_40` / `..._game` | Scatter plot minuti/Impact Score con retta di regressione lineare |
+| `plot_cluster_analysis_40` / `..._game` | Cluster analysis K-Means (3 cluster) su minuti e Impact Score standardizzati |
+| `build_top10_comparison_game` / `..._40` | Tabella comparativa della Top 10 con le statistiche medie per partita |
+| `plot_top10_bar_chart_40` / `..._game` | Bar chart della Top 10 per ciascuna versione dell'indicatore |
+| `calculate_score_by_position_game` / `..._40` | Impact Score medio per ruolo, ordinato in senso decrescente |
+| `plot_position_comparison(scores_game, scores_40)` | Bar chart affiancato delle due medie per ruolo, con ruoli ordinati da `G` a `C` |
+
+Convenzione dei nomi: le funzioni iniziano con un verbo (`calculate_`, `build_`, `plot_`, `filter_`, `explore_`), le variabili sono sostantivi. Le funzioni che esistono in due versioni portano il suffisso `_game` o `_40`. I DataFrame che attraversano l'analisi si chiamano `season_stats` (totali di stagione) → `per_game_stats` (medie per partita) → `qualified_players` (dopo il filtro) → `ranking_game` / `ranking_40` (con l'Impact Score calcolato e ordinato).
 
 ### Note implementative
 
 Scelte ricorrenti nel codice, raccolte qui per tenere i commenti nel file al minimo.
 
-**Copie difensive.** Ogni funzione di analisi apre con `data_impact.copy()` e lavora sulla copia: il DataFrame del chiamante conserva le sue colonne originali, così le funzioni possono essere richiamate in qualunque ordine senza dipendere l'una dall'altra.
+**Copie difensive.** Ogni funzione di analisi apre con una `.copy()` del DataFrame ricevuto e lavora sulla copia: il DataFrame del chiamante conserva le sue colonne originali, così le funzioni possono essere richiamate in qualunque ordine senza dipendere l'una dall'altra.
 
 **Divisioni per zero.** Le medie non vengono mai calcolate su un denominatore nullo. Prima di dividere, il denominatore passa per `.where(colonna > 0)`, che trasforma gli zeri in `NaN`: un giocatore con 0 partite (o 0 minuti) esce dall'analisi come dato mancante invece di generare un `inf`.
 
