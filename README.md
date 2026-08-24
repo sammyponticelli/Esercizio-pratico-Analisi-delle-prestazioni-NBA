@@ -27,7 +27,7 @@ Variabili principali utilizzate nell'analisi:
 | `wins`, `losses` | Vittorie e sconfitte (usate per derivare le partite giocate) |
 | `position` | Ruolo (G / F / C e combinazioni) — non entra nella formula, ma è la variabile di raggruppamento della fase 8 |
 
-Variabili presenti nel dataset ma **non** utilizzate nel calcolo dell'Impact Score (utili per la ricerca di correlazioni della fase 6):
+Variabili presenti nel dataset ma **non** utilizzate nell'analisi:
 
 | Variabile | Descrizione |
 |---|---|
@@ -138,7 +138,6 @@ I risultati vengono utilizzati per determinare:
 - qual è la loro età media;
 - quale fascia d'età presenta il maggiore Impact Score;
 - quale relazione esiste tra minuti giocati e Impact Score, e quanto la normalizzazione per 40 minuti modifica il quadro;
-- quali altre variabili risultano significativamente correlate con l'Impact Score;
 - quale ruolo presenta mediamente il maggiore impatto.
 
 ---
@@ -152,7 +151,7 @@ I risultati vengono utilizzati per determinare:
 | 3. Calcolo dell'Impact Score | ✅ implementata — entrambe le versioni (per partita e per 40 minuti) |
 | 4. Analisi della Top 10 | ✅ implementata — su entrambe le versioni |
 | 5. Analisi per fascia d'età | ✅ implementata — su entrambe le versioni |
-| 6. Ricerca correlazioni significative | 🟡 parziale — correlazione minuti/impact, scatter con regressione e cluster analysis implementati per entrambe le versioni; correlazioni con altre variabili da implementare |
+| 6. Ricerca correlazioni significative | ✅ implementata — correlazione minuti/impact, scatter con regressione e cluster analysis, su entrambe le versioni |
 | 7. Confronto tra i giocatori | ✅ implementata — tabelle comparative e bar chart delle Top 10, su entrambe le versioni |
 | 8. Impact Score per ruolo | ✅ implementata — medie per ruolo e bar chart di confronto tra le due versioni |
 | 9. Conclusioni | 🔜 da implementare |
@@ -220,14 +219,13 @@ Scelte ricorrenti nel codice, raccolte qui per tenere i commenti nel file al min
 - NumPy
 - Matplotlib
 - scikit-learn (`StandardScaler`, `KMeans`)
-- Seaborn (previsto per la heatmap della matrice di correlazione, non ancora utilizzato)
 
 ---
 
 ## Come eseguire l'analisi
 
 ```bash
-pip install pandas numpy matplotlib seaborn scikit-learn
+pip install pandas numpy matplotlib scikit-learn
 python analisi_nba.py
 ```
 
