@@ -7,6 +7,8 @@ The Impact Score is computed with a predefined formula in which every individual
 - **`impact_score_game`** — average impact *per game* (measures the overall volume of production);
 - **`impact_score_40`** — impact normalised *per 40 minutes* of play (measures efficiency per unit of time).
 
+The full write-up of the findings, with all the charts and their reading, is in **[REPORT.md](REPORT.md)**. This file documents the data, the method and the code.
+
 ---
 
 ## Dataset
@@ -176,6 +178,8 @@ What comes out of it:
 nba_analysis_exercise/
 ├── nba_analysis.py                                   # analysis script
 ├── nba_players_25_26_regular_season_wide_data.csv    # dataset
+├── charts/                                           # the seven figures, saved as PNG
+├── REPORT.md                                         # write-up of the findings
 ├── .gitignore
 └── README.md
 ```
