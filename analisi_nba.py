@@ -369,6 +369,36 @@ def calculate_score_by_position_40(ranking):
     print(position_table)
     return position_table
 
+def build_conclusions_table(ranking_40, ranking_game, age_group_table_40, age_group_table_game,
+                            correlations, position_scores_40, position_scores_game):
+    #the rankings are already sorted, so the best player is the first row
+    top_player_game = ranking_game.iloc[0]
+    top_player_40 = ranking_40.iloc[0]
+
+    best_age_group_game = age_group_table_game.loc['average_impact_score'].idxmax()
+    best_age_group_40 = age_group_table_40.loc['average_impact_score'].idxmax()
+
+    conclusions = pd.DataFrame(
+        {'per_game': [f"{top_player_game['player_name']} ({top_player_game['impact_score_game']})",
+                      calculate_top10_average_score_game(ranking_game),
+                      calculate_top10_average_age_game(ranking_game),
+                      f"{best_age_group_game} "
+                      f"({age_group_table_game.loc['average_impact_score'].max()})",
+                      correlations['corr_minutes_game'],
+                      f'{position_scores_game.index[0]} ({position_scores_game.iloc[0]})'],
+         'per_40_minutes': [f"{top_player_40['player_name']} ({top_player_40['impact_score_40']})",
+                            calculate_top10_average_score_40(ranking_40),
+                            calculate_top10_average_age_40(ranking_40),
+                            f"{best_age_group_40} "
+                            f"({age_group_table_40.loc['average_impact_score'].max()})",
+                            correlations['corr_minutes_40'],
+                            f'{position_scores_40.index[0]} ({position_scores_40.iloc[0]})']},
+        index=['highest impact', 'top 10 average impact score', 'top 10 average age',
+               'best age band', 'minutes played correlation', 'best position'])
+
+    print(conclusions)
+    return conclusions
+
 def plot_position_comparison(scores_game, scores_40):
     position_order = ['G', 'G-F', 'F-G', 'F', 'F-C', 'C-F', 'C']
 
@@ -441,6 +471,11 @@ build_top10_comparison_40(qualified_players)
 position_scores_game = calculate_score_by_position_game(ranking_game)
 print('\n')
 position_scores_40 = calculate_score_by_position_40(ranking_40)
+print('\n')
+
+#9. conclusions
+build_conclusions_table(ranking_40, ranking_game, age_group_table_40, age_group_table_game,
+                        correlations, position_scores_40, position_scores_game)
 
 
 # --- charts ---

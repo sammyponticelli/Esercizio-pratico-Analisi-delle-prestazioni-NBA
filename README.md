@@ -132,13 +132,25 @@ Risultati:
 Il confronto tra le due colonne cambia la lettura: per partita il valore più alto è quello degli `F-G`, ma si tratta di un gruppo poco numeroso e trainato dai minutaggi elevati dei suoi giocatori di punta; una volta normalizzato per 40 minuti l'impatto si sposta stabilmente verso i ruoli interni (`C-F`, `C`, `F-C`), coerentemente con il peso che la formula assegna a rimbalzi e stoppate.
 
 ### 9. Conclusioni
-I risultati vengono utilizzati per determinare:
-- quali giocatori presentano il maggiore impatto;
-- qual è l'Impact Score medio dei migliori giocatori;
-- qual è la loro età media;
-- quale fascia d'età presenta il maggiore Impact Score;
-- quale relazione esiste tra minuti giocati e Impact Score, e quanto la normalizzazione per 40 minuti modifica il quadro;
-- quale ruolo presenta mediamente il maggiore impatto.
+I risultati delle fasi precedenti confluiscono in una **tabella riepilogativa** che affianca le due versioni dell'indicatore, una domanda dell'analisi per riga:
+
+| | per partita | per 40 minuti |
+|---|---|---|
+| Giocatore di maggiore impatto | Nikola Jokić (59.93) | Nikola Jokić (68.81) |
+| Impact Score medio della Top 10 | 48.67 | 59.07 |
+| Età media della Top 10 | 27.5 | 27.7 |
+| Fascia d'età con l'impatto più alto | 35+ (26.03) | 35+ (39.09) |
+| Correlazione con i minuti giocati | 0.76 | 0.39 |
+| Ruolo con l'impatto più alto | F-G (28.54) | C-F (41.72) |
+
+Cosa se ne ricava:
+
+- **Jokić è primo in entrambe le classifiche.** È il risultato più solido dell'analisi: resta davanti anche quando si toglie di mezzo il minutaggio, quindi il suo vantaggio non dipende dal tempo che passa in campo.
+- **Le due medie della Top 10 non vanno confrontate tra loro.** 48.67 e 59.07 vivono su scale diverse: nessuno gioca 40 minuti di media, quindi la normalizzazione riscala tutti i punteggi verso l'alto. Ogni numero va letto dentro la propria colonna.
+- **L'età media dei migliori è la stessa nelle due versioni**, poco sopra i 27 anni: il picco di rendimento non si sposta a seconda di come si misura l'impatto.
+- **La fascia 35+ ha la media più alta in entrambe le versioni, ma è un effetto di selezione.** Sono 20 giocatori su 419: a quell'età resta in campo quasi solo chi è ancora molto forte, mentre le fasce giovani contengono anche tutte le riserve.
+- **La correlazione con i minuti crolla da 0.76 a 0.39.** La produzione per partita è in buona parte spiegata dal minutaggio concesso; la normalizzazione ne rimuove la maggior parte, e ciò che resta indica che gli allenatori tendono comunque a dare più spazio ai giocatori più efficienti.
+- **Il ruolo di maggiore impatto cambia con la metrica.** Per partita svettano gli `F-G`, per 40 minuti i ruoli interni (`C-F`, `C`, `F-C`): è la conferma più netta che le due versioni dell'indicatore rispondono a domande diverse.
 
 ---
 
@@ -154,7 +166,7 @@ I risultati vengono utilizzati per determinare:
 | 6. Ricerca correlazioni significative | ✅ implementata — correlazione minuti/impact, scatter con regressione e cluster analysis, su entrambe le versioni |
 | 7. Confronto tra i giocatori | ✅ implementata — tabelle comparative e bar chart delle Top 10, su entrambe le versioni |
 | 8. Impact Score per ruolo | ✅ implementata — medie per ruolo e bar chart di confronto tra le due versioni |
-| 9. Conclusioni | 🔜 da implementare |
+| 9. Conclusioni | ✅ implementata — tabella riepilogativa con le due versioni affiancate |
 
 ---
 
@@ -189,6 +201,7 @@ nba_analysis_exercise/
 | `plot_top10_bar_chart_40` / `..._game` | Bar chart della Top 10 per ciascuna versione dell'indicatore |
 | `calculate_score_by_position_game` / `..._40` | Impact Score medio per ruolo, ordinato in senso decrescente |
 | `plot_position_comparison(scores_game, scores_40)` | Bar chart affiancato delle due medie per ruolo, con ruoli ordinati da `G` a `C` |
+| `build_conclusions_table(...)` | Tabella riepilogativa finale: le sei risposte dell'analisi, per partita e per 40 minuti |
 
 Convenzione dei nomi: le funzioni iniziano con un verbo (`calculate_`, `build_`, `plot_`, `filter_`, `explore_`), le variabili sono sostantivi. Le funzioni che esistono in due versioni portano il suffisso `_game` o `_40`. I DataFrame che attraversano l'analisi si chiamano `season_stats` (totali di stagione) → `per_game_stats` (medie per partita) → `qualified_players` (dopo il filtro) → `ranking_game` / `ranking_40` (con l'Impact Score calcolato e ordinato).
 
