@@ -237,13 +237,15 @@ L'esecuzione stampa a console le tabelle riepilogative e apre **sette finestre M
 
 | # | Grafico |
 |---|---|
-| 1 | Scatter plot minuti / `impact_score_game` con retta di regressione |
-| 2 | Cluster analysis su minuti e `impact_score_game` |
-| 3 | Scatter plot minuti / `impact_score_40` con retta di regressione |
-| 4 | Cluster analysis su minuti e `impact_score_40` |
+| 1 | Scatter plot minuti / `impact_score_40` con retta di regressione |
+| 2 | Scatter plot minuti / `impact_score_game` con retta di regressione |
+| 3 | Cluster analysis su minuti e `impact_score_40` |
+| 4 | Cluster analysis su minuti e `impact_score_game` |
 | 5 | Bar chart Top 10 per `impact_score_40` |
 | 6 | Bar chart Top 10 per `impact_score_game` |
 | 7 | Bar chart di confronto dell'Impact Score medio per ruolo |
+
+Il main program è diviso in due blocchi: prima tutte le tabelle stampate a console nell'ordine delle fasi 1-8, poi tutti i grafici raggruppati per tipo (i due scatter, i due cluster, le due Top 10, il confronto per ruolo). Le finestre si aprono tutte insieme su `plt.show()`, quindi tenerle raggruppate rende prevedibile l'ordine in cui compaiono.
 
 ---
 

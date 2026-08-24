@@ -388,7 +388,10 @@ def plot_position_comparison(scores_game, scores_40):
     plt.tight_layout()
 
 
-#main program
+#main program: first the tables, then the charts
+
+
+# --- data ---
 
 #1. exploring the dataset
 explore_dataset(raw_data)
@@ -424,26 +427,33 @@ print('\n')
 age_group_table_game = build_age_group_table_game(ranking_game)
 print('\n')
 
-#6. minutes played against impact score: correlation, regression line, clusters
+#6. correlation between minutes played and impact score
 correlations = collect_correlations(ranking_game, ranking_40)
 print(correlations)
-plot_minutes_vs_score_game(ranking_game, correlations['corr_minutes_game'])
-plot_cluster_analysis_game(ranking_game)
-plot_minutes_vs_score_40(ranking_40, correlations['corr_minutes_40'])
-plot_cluster_analysis_40(ranking_40)
 print('\n')
 
 #7. the top 10 compared on the statistics the formula is built on
 build_top10_comparison_game(qualified_players)
 print('\n')
 build_top10_comparison_40(qualified_players)
-plot_top10_bar_chart_40(ranking_40)
-plot_top10_bar_chart_game(ranking_game)
 
-#8. average impact score by position, the two versions side by side
+#8. average impact score by position
 position_scores_game = calculate_score_by_position_game(ranking_game)
 print('\n')
 position_scores_40 = calculate_score_by_position_40(ranking_40)
+
+
+# --- charts ---
+
+plot_minutes_vs_score_40(ranking_40, correlations['corr_minutes_40'])
+plot_minutes_vs_score_game(ranking_game, correlations['corr_minutes_game'])
+
+plot_cluster_analysis_40(ranking_40)
+plot_cluster_analysis_game(ranking_game)
+
+plot_top10_bar_chart_40(ranking_40)
+plot_top10_bar_chart_game(ranking_game)
+
 plot_position_comparison(position_scores_game, position_scores_40)
 
 plt.show()
