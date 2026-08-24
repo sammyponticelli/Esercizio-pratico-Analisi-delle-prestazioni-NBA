@@ -334,6 +334,44 @@ def bar_chart_top10_game(data_impact):
     plt.tight_layout()
     plt.subplots_adjust(bottom=0.27)
 
+def impact_score_by_position_game(data_impact):
+    data_impact = data_impact.copy()
+
+    position_table = data_impact.groupby('position')['impact_score_game'].mean().round(2)
+    position_table =  position_table.sort_values(ascending=False)
+
+    print(position_table)
+    return position_table
+
+def  impact_score_by_position_40(data_impact):
+    data_impact = data_impact.copy()
+
+    position_table = data_impact.groupby('position')['impact_score_40'].mean().round(2)
+    position_table =  position_table.sort_values(ascending=False)
+    print(position_table)
+    return position_table
+
+def bar_chart_position_comparison(position_game, position_40):
+
+    position_order = ['G', 'G-F', 'F-G', 'F', 'F-C', 'C-F', 'C']
+
+    position_game = position_game.reindex(position_order)
+    position_40 = position_40.reindex(position_order)
+    x = np.arange(len(position_game))
+    width = 0.35
+
+    plt.figure()
+    plt.bar(x - width/2, position_game.values, width, label='Impact Score per game')
+    plt.bar(x + width/2, position_40.values, width, label='Impact Score per 40 minutes')
+    plt.xlabel('position')
+    plt.ylabel('average impact score')
+    plt.title('Average Impact Score by Position')
+    plt.xticks(x, position_game.index)
+    plt.legend()
+    plt.tight_layout()
+
+    
+
 
 
     
@@ -376,6 +414,11 @@ print('\n')
 compare_top10_40(average_dataset)
 bar_chart_top10_40(impact_score_40)
 bar_chart_top10_game(data_impact_game)
+position_game = impact_score_by_position_game(data_impact_game)
+print('\n')
+position_40 = impact_score_by_position_40(impact_score_40)
+bar_chart_position = bar_chart_position_comparison(position_game, position_40)
+
 
 plt.show()
 
