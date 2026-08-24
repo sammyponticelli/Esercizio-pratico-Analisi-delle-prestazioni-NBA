@@ -109,26 +109,6 @@ Il confronto tra le due correlazioni è di per sé un risultato dell'analisi:
 
 La correlazione forte sul punteggio per partita conferma che la produzione complessiva dipende in larga misura dal minutaggio; la normalizzazione per 40 minuti ne rimuove buona parte, pur lasciando una correlazione positiva residua — segno che gli allenatori tendono comunque a concedere più minuti ai giocatori più efficienti.
 
-La fase comprende inoltre la **ricerca di correlazioni significative tra l'Impact Score e ulteriori variabili non utilizzate nella sua formula** (da implementare). Le statistiche che compongono l'Impact Score (punti, rimbalzi, assist, recuperi, stoppate, palle perse) sono escluse per costruzione, perché correlate con esso per definizione.
-
-Variabili candidate:
-
-- `age_completed_years` — età (già disponibile nel dataset di lavoro);
-- `height_m` e `weight_kg` — caratteristiche fisiche;
-- `experience` — anni di esperienza in NBA (da confrontare con l'età, con cui è collineare);
-- `personal_fouls` (per partita o per 40 minuti) — aggressività / disciplina difensiva;
-- percentuali di realizzazione derivate dai tiri tentati (`*_made / *_attempted`) — efficienza al tiro;
-- `games_played` — continuità e disponibilità;
-- variabili categoriali come `position`, `team` o `country`, da trattare con confronti tra gruppi anziché con la correlazione di Pearson.
-
-Approccio previsto:
-
-1. costruire le variabili derivate necessarie (percentuali al tiro, falli per 40 minuti, ecc.);
-2. calcolare la matrice di correlazione tra le due versioni dell'Impact Score e le variabili candidate, visualizzandola con una heatmap;
-3. selezionare le correlazioni più forti e rappresentarle con scatter plot e retta di regressione;
-4. valutare la **significatività statistica** (p-value) oltre all'intensità del coefficiente, per distinguere le relazioni reali da quelle casuali;
-5. commentare i risultati, tenendo presente che la correlazione non implica un rapporto di causa-effetto.
-
 ### 7. Confronto tra i giocatori
 Confronto dei giocatori della Top 10 attraverso le principali statistiche individuali, con tabella comparativa e visualizzazione degli Impact Score.
 
