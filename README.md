@@ -1,125 +1,125 @@
 # NBA Impact Analysis
 
-Analisi dell'impatto dei giocatori NBA sulle prestazioni in partita attraverso un indicatore sintetico, denominato **Impact Score**.
+Analysis of how much NBA players contribute to their team's performance, through a synthetic indicator called the **Impact Score**.
 
-L'Impact Score viene calcolato con una formula predefinita nella quale ogni statistica individuale presenta un peso specifico. L'analisi produce **due versioni** dell'indicatore, calcolate in parallelo e confrontate tra loro:
+The Impact Score is computed with a predefined formula in which every individual statistic carries a specific weight. The analysis produces **two versions** of the indicator, computed in parallel and compared against each other:
 
-- **`impact_score_game`** — impatto medio *per partita* (misura il volume complessivo di produzione);
-- **`impact_score_40`** — impatto normalizzato *per 40 minuti* di gioco (misura l'efficienza per unità di tempo).
+- **`impact_score_game`** — average impact *per game* (measures the overall volume of production);
+- **`impact_score_40`** — impact normalised *per 40 minutes* of play (measures efficiency per unit of time).
 
 ---
 
 ## Dataset
 
-`nba_players_25_26_regular_season_wide_data.csv` — statistiche individuali della **Regular Season NBA 2025-26** (582 giocatori, 28 variabili).
+`nba_players_25_26_regular_season_wide_data.csv` — individual statistics for the **2025-26 NBA Regular Season** (582 players, 28 variables).
 
-Variabili principali utilizzate nell'analisi:
+Main variables used in the analysis:
 
-| Variabile | Descrizione |
+| Variable | Description |
 |---|---|
-| `player_name` | Nome del giocatore |
-| `age_completed_years` | Età (anni compiuti) |
-| `team` | Squadra |
-| `minutes_played` | Minuti giocati (totali di stagione) |
-| `one_point_made`, `two_point_made`, `three_point_made` | Canestri realizzati per tipologia |
-| `offensive_rebounds`, `defensive_rebounds` | Rimbalzi offensivi e difensivi |
-| `assists`, `steals`, `blocks`, `turnovers` | Assist, palle rubate, stoppate, palle perse |
-| `wins`, `losses` | Vittorie e sconfitte (usate per derivare le partite giocate) |
-| `position` | Ruolo (G / F / C e combinazioni) — non entra nella formula, ma è la variabile di raggruppamento della fase 8 |
+| `player_name` | Player name |
+| `age_completed_years` | Age (completed years) |
+| `team` | Team |
+| `minutes_played` | Minutes played (season totals) |
+| `one_point_made`, `two_point_made`, `three_point_made` | Made shots by type |
+| `offensive_rebounds`, `defensive_rebounds` | Offensive and defensive rebounds |
+| `assists`, `steals`, `blocks`, `turnovers` | Assists, steals, blocks, turnovers |
+| `wins`, `losses` | Wins and losses (used to derive games played) |
+| `position` | Position (G / F / C and combinations) — not part of the formula, but the grouping variable of phase 8 |
 
-Variabili presenti nel dataset ma **non** utilizzate nell'analisi:
+Variables present in the dataset but **not** used in the analysis:
 
-| Variabile | Descrizione |
+| Variable | Description |
 |---|---|
-| `height_m`, `weight_kg` | Altezza e peso |
-| `experience` | Anni di esperienza in NBA |
-| `country` | Nazionalità |
-| `personal_fouls` | Falli personali |
-| `one_point_attempted`, `two_point_attempted`, `three_point_attempted` | Tiri tentati per tipologia (da cui derivare le percentuali di realizzazione) |
+| `height_m`, `weight_kg` | Height and weight |
+| `experience` | Years of NBA experience |
+| `country` | Nationality |
+| `personal_fouls` | Personal fouls |
+| `one_point_attempted`, `two_point_attempted`, `three_point_attempted` | Attempted shots by type (from which shooting percentages could be derived) |
 
-I dati sono di stagione (totali): le medie per partita vengono derivate nel corso dell'analisi.
+The data is seasonal (totals): per-game averages are derived during the analysis.
 
 ---
 
-## Formula dell'Impact Score
+## The Impact Score formula
 
-Le statistiche sono espresse come **medie per partita**. Da questa base si ricavano le due versioni dell'indicatore.
+The statistics are expressed as **per-game averages**. Both versions of the indicator are derived from that base.
 
-**Impact Score per partita:**
+**Impact Score per game:**
 
 ```
 impact_score_game = PTS + 1.2 · REB + 1.5 · AST + 2 · STL + 2 · BLK − TOV
 ```
 
-**Impact Score normalizzato per 40 minuti:**
+**Impact Score normalised per 40 minutes:**
 
 ```
 impact_score_40 = (PTS + 1.2 · REB + 1.5 · AST + 2 · STL + 2 · BLK − TOV) / MIN · 40
 ```
 
-dove:
+where:
 
 - `PTS = one_point_made + 2 · two_point_made + 3 · three_point_made`
 - `REB = offensive_rebounds + defensive_rebounds`
 - `games_played = wins + losses`
-- `MIN` = minuti medi per partita
+- `MIN` = average minutes per game
 
-I pesi premiano le giocate a maggiore valore aggiunto (assist, recuperi, stoppate) e penalizzano le palle perse.
+The weights reward the plays with the highest added value (assists, steals, blocks) and penalise turnovers.
 
-Le due versioni rispondono a domande diverse: `impact_score_game` misura **quanto un giocatore produce complessivamente**, ed è quindi legato al minutaggio concesso dall'allenatore; `impact_score_40` rende confrontabili giocatori con minutaggi molto diversi, misurando l'impatto **per unità di tempo**. Il confronto tra le due permette di distinguere i giocatori che producono molto perché giocano molto da quelli che risultano efficienti a prescindere dal tempo in campo.
+The two versions answer different questions: `impact_score_game` measures **how much a player produces overall**, and is therefore tied to the minutes the coach gives them; `impact_score_40` makes players with very different playing times comparable, measuring impact **per unit of time**. Comparing the two tells apart the players who produce a lot because they play a lot from those who are efficient regardless of time on court.
 
-### Filtro sulle partite giocate
+### Games played filter
 
-Poiché la normalizzazione per minuti tende a premiare i giocatori con pochissimo utilizzo (campioni molto piccoli), l'analisi considera solo i giocatori che hanno disputato almeno **1/3 delle partite del giocatore più utilizzato** del dataset. Si tratta di una soglia *relativa*: funziona anche su una stagione ancora in corso, senza dover fissare un numero di partite predefinito.
+Since normalising by minutes tends to reward players with very little playing time (very small samples), the analysis only considers players who have played at least **1/3 of the games of the most used player** in the dataset. This is a *relative* threshold: it works on a season still in progress, without having to fix a predefined number of games.
 
 ---
 
-## Struttura dell'analisi
+## Structure of the analysis
 
-### 1. Esplorazione del dataset
-Analisi della struttura del dataset, individuazione delle variabili disponibili, analisi dei tipi di dati, controllo di valori mancanti e duplicati.
+### 1. Dataset exploration
+Analysis of the structure of the dataset, identification of the available variables, analysis of the data types, check for missing values and duplicates.
 
-### 2. Pulizia e preparazione dei dati
-Gestione dei valori mancanti, eliminazione di eventuali duplicati, conversione delle variabili nei formati appropriati e preparazione dei dati necessari all'analisi.
+### 2. Data cleaning and preparation
+Handling of missing values, removal of any duplicates, conversion of the variables into the appropriate formats and preparation of the data the analysis needs.
 
-Scelte adottate:
-- valori mancanti in `wins` / `losses` trattati come 0 partite giocate;
-- giocatori con 0 partite giocate esclusi dal calcolo delle medie (`NaN` invece di divisione per zero).
+Choices made:
+- missing values in `wins` / `losses` treated as 0 games played;
+- players with 0 games played excluded from the averages (`NaN` instead of a division by zero).
 
-### 3. Calcolo dell'Impact Score
-Applicazione della formula predefinita, tenendo conto dei diversi pesi assegnati alle statistiche dei giocatori. Prima del calcolo viene applicato il filtro sulle partite giocate. Il risultato viene memorizzato nelle due nuove variabili `impact_score_game` e `impact_score_40`.
+### 3. Impact Score computation
+Application of the predefined formula, accounting for the different weights assigned to the player statistics. The games played filter is applied before the computation. The result is stored in the two new variables `impact_score_game` and `impact_score_40`.
 
-### 4. Analisi della Top 10
-Ordinamento dei giocatori in base all'Impact Score e individuazione dei 10 giocatori con il punteggio più elevato. Per la Top 10 vengono calcolati **Impact Score medio** ed **età media**. L'analisi viene eseguita separatamente sulle due versioni dell'indicatore, ottenendo così due classifiche distinte.
+### 4. Top 10 analysis
+Players are sorted by Impact Score and the 10 with the highest score are singled out. For the Top 10 the **average Impact Score** and the **average age** are computed. The analysis runs separately on the two versions of the indicator, producing two distinct rankings.
 
-### 5. Analisi per fascia d'età
-Suddivisione dei giocatori nelle fasce **19–22**, **23–26**, **27–30**, **31–34**, **35+** anni. Per ogni fascia: numero di giocatori, Impact Score medio, Impact Score massimo. Anche in questo caso la tabella viene costruita per entrambe le versioni dell'indicatore.
+### 5. Analysis by age band
+Players are split into the **19–22**, **23–26**, **27–30**, **31–34** and **35+** bands. For each band: number of players, average Impact Score, maximum Impact Score. Here too the table is built for both versions of the indicator.
 
-### 6. Ricerca correlazioni significative
-Analisi della relazione tra i **minuti giocati** e ciascuna delle due versioni dell'Impact Score: coefficiente di correlazione di Pearson, scatter plot e retta di regressione lineare sovrapposta al grafico.
+### 6. Search for significant correlations
+Analysis of the relationship between **minutes played** and each of the two versions of the Impact Score: Pearson correlation coefficient, scatter plot and linear regression line drawn on top of the chart.
 
-A completamento della fase viene eseguita una **cluster analysis** (K-Means, 3 cluster, su minuti giocati e Impact Score standardizzati) per individuare gruppi di giocatori con profili simili di utilizzo e impatto. Anche le due cluster analysis vengono prodotte in parallelo, una per versione dell'indicatore.
+The phase is completed by a **cluster analysis** (K-Means, 3 clusters, on standardised minutes played and Impact Score) that identifies groups of players with similar profiles of usage and impact. The two cluster analyses are produced in parallel as well, one per version of the indicator.
 
-Il confronto tra le due correlazioni è di per sé un risultato dell'analisi:
+The comparison between the two correlations is itself a result of the analysis:
 
-| Relazione | Pearson |
+| Relationship | Pearson |
 |---|---|
 | `minutes_played` ↔ `impact_score_game` | **0.76** |
 | `minutes_played` ↔ `impact_score_40` | **0.39** |
 
-La correlazione forte sul punteggio per partita conferma che la produzione complessiva dipende in larga misura dal minutaggio; la normalizzazione per 40 minuti ne rimuove buona parte, pur lasciando una correlazione positiva residua — segno che gli allenatori tendono comunque a concedere più minuti ai giocatori più efficienti.
+The strong correlation on the per-game score confirms that overall production depends largely on playing time; normalising per 40 minutes removes most of it, while leaving a residual positive correlation — a sign that coaches do tend to give more minutes to the more efficient players.
 
-### 7. Confronto tra i giocatori
-Confronto dei giocatori della Top 10 attraverso le principali statistiche individuali (`PTS`, `REB`, `AST`, `STL`, `BLK`, `TOV`, `MIN` medi per partita), con una tabella comparativa per ciascuna versione dell'indicatore e due **bar chart** delle rispettive Top 10.
+### 7. Player comparison
+The Top 10 players are compared on the main individual statistics (`PTS`, `REB`, `AST`, `STL`, `BLK`, `TOV`, `MIN` per-game averages), with one comparison table per version of the indicator and two **bar charts** of the respective Top 10.
 
-Tabelle e grafici sono costruiti sul dataset **filtrato** dalla fase 3, quindi le classifiche coincidono con quelle della fase 4. Le due tabelle sono indipendenti l'una dall'altra: ciascuna lavora su una propria copia del dataset filtrato.
+Tables and charts are built on the dataset **filtered** in phase 3, so the rankings match those of phase 4. The two tables are independent of each other: each works on its own copy of the filtered dataset.
 
-### 8. Analisi dell'Impact Score per ruolo
-Impact Score medio raggruppato per ruolo (`position`), calcolato su entrambe le versioni dell'indicatore, con **bar chart affiancato** che mette a confronto le due medie ruolo per ruolo (ruoli ordinati lungo il continuum guardia → centro: `G`, `G-F`, `F-G`, `F`, `F-C`, `C-F`, `C`).
+### 8. Impact Score by position
+Average Impact Score grouped by position (`position`), computed on both versions of the indicator, with a **grouped bar chart** comparing the two averages position by position (positions ordered along the guard → centre continuum: `G`, `G-F`, `F-G`, `F`, `F-C`, `C-F`, `C`).
 
-Risultati:
+Results:
 
-| Ruolo | Impact Score per partita | Impact Score per 40 minuti |
+| Position | Impact Score per game | Impact Score per 40 minutes |
 |---|---|---|
 | `G` | 19.74 | 33.96 |
 | `G-F` | 20.61 | 33.27 |
@@ -129,103 +129,103 @@ Risultati:
 | `C-F` | 24.45 | **41.72** |
 | `C` | 22.21 | 40.44 |
 
-Il confronto tra le due colonne cambia la lettura: per partita il valore più alto è quello degli `F-G`, ma si tratta di un gruppo poco numeroso e trainato dai minutaggi elevati dei suoi giocatori di punta; una volta normalizzato per 40 minuti l'impatto si sposta stabilmente verso i ruoli interni (`C-F`, `C`, `F-C`), coerentemente con il peso che la formula assegna a rimbalzi e stoppate.
+Comparing the two columns changes the reading: per game the highest value belongs to the `F-G` group, but it is a small group pulled up by the heavy minutes of its best players; once normalised per 40 minutes the impact shifts steadily towards the interior positions (`C-F`, `C`, `F-C`), consistently with the weight the formula gives to rebounds and blocks.
 
-### 9. Conclusioni
-I risultati delle fasi precedenti confluiscono in una **tabella riepilogativa** che affianca le due versioni dell'indicatore, una domanda dell'analisi per riga:
+### 9. Conclusions
+The results of the previous phases come together in a **summary table** that puts the two versions of the indicator side by side, one question of the analysis per row:
 
-| | per partita | per 40 minuti |
+| | per game | per 40 minutes |
 |---|---|---|
-| Giocatore di maggiore impatto | Nikola Jokić (59.93) | Nikola Jokić (68.81) |
-| Impact Score medio della Top 10 | 48.67 | 59.07 |
-| Età media della Top 10 | 27.5 | 27.7 |
-| Fascia d'età con l'impatto più alto | 35+ (26.03) | 35+ (39.09) |
-| Correlazione con i minuti giocati | 0.76 | 0.39 |
-| Ruolo con l'impatto più alto | F-G (28.54) | C-F (41.72) |
+| Highest impact player | Nikola Jokić (59.93) | Nikola Jokić (68.81) |
+| Top 10 average Impact Score | 48.67 | 59.07 |
+| Top 10 average age | 27.5 | 27.7 |
+| Age band with the highest impact | 35+ (26.03) | 35+ (39.09) |
+| Correlation with minutes played | 0.76 | 0.39 |
+| Position with the highest impact | F-G (28.54) | C-F (41.72) |
 
-Cosa se ne ricava:
+What comes out of it:
 
-- **Jokić è primo in entrambe le classifiche.** È il risultato più solido dell'analisi: resta davanti anche quando si toglie di mezzo il minutaggio, quindi il suo vantaggio non dipende dal tempo che passa in campo.
-- **Le due medie della Top 10 non vanno confrontate tra loro.** 48.67 e 59.07 vivono su scale diverse: nessuno gioca 40 minuti di media, quindi la normalizzazione riscala tutti i punteggi verso l'alto. Ogni numero va letto dentro la propria colonna.
-- **L'età media dei migliori è la stessa nelle due versioni**, poco sopra i 27 anni: il picco di rendimento non si sposta a seconda di come si misura l'impatto.
-- **La fascia 35+ ha la media più alta in entrambe le versioni, ma è un effetto di selezione.** Sono 20 giocatori su 419: a quell'età resta in campo quasi solo chi è ancora molto forte, mentre le fasce giovani contengono anche tutte le riserve.
-- **La correlazione con i minuti crolla da 0.76 a 0.39.** La produzione per partita è in buona parte spiegata dal minutaggio concesso; la normalizzazione ne rimuove la maggior parte, e ciò che resta indica che gli allenatori tendono comunque a dare più spazio ai giocatori più efficienti.
-- **Il ruolo di maggiore impatto cambia con la metrica.** Per partita svettano gli `F-G`, per 40 minuti i ruoli interni (`C-F`, `C`, `F-C`): è la conferma più netta che le due versioni dell'indicatore rispondono a domande diverse.
+- **Jokić is first in both rankings.** This is the most solid result of the analysis: he stays ahead even once playing time is taken out of the picture, so his edge does not depend on how long he is on the court.
+- **The two Top 10 averages are not comparable with each other.** 48.67 and 59.07 live on different scales: nobody averages 40 minutes, so the normalisation rescales every score upwards. Each number has to be read inside its own column.
+- **The average age of the best players is the same in both versions**, just above 27: the performance peak does not move depending on how impact is measured.
+- **The 35+ band has the highest average in both versions, but this is a selection effect.** It is 20 players out of 419: at that age only those who are still very strong stay on the court, while the younger bands also contain every bench player.
+- **The correlation with minutes drops from 0.76 to 0.39.** Per-game production is largely explained by the minutes granted; normalising removes most of that, and what remains suggests coaches do give more room to the more efficient players.
+- **The position with the highest impact changes with the metric.** Per game the `F-G` group stands out, per 40 minutes the interior positions (`C-F`, `C`, `F-C`) do: the clearest confirmation that the two versions of the indicator answer different questions.
 
 ---
 
-## Stato di avanzamento
+## Progress
 
-| Sezione | Stato |
+| Section | Status |
 |---|---|
-| 1. Esplorazione del dataset | ✅ implementata |
-| 2. Pulizia e preparazione dei dati | ✅ implementata |
-| 3. Calcolo dell'Impact Score | ✅ implementata — entrambe le versioni (per partita e per 40 minuti) |
-| 4. Analisi della Top 10 | ✅ implementata — su entrambe le versioni |
-| 5. Analisi per fascia d'età | ✅ implementata — su entrambe le versioni |
-| 6. Ricerca correlazioni significative | ✅ implementata — correlazione minuti/impact, scatter con regressione e cluster analysis, su entrambe le versioni |
-| 7. Confronto tra i giocatori | ✅ implementata — tabelle comparative e bar chart delle Top 10, su entrambe le versioni |
-| 8. Impact Score per ruolo | ✅ implementata — medie per ruolo e bar chart di confronto tra le due versioni |
-| 9. Conclusioni | ✅ implementata — tabella riepilogativa con le due versioni affiancate |
+| 1. Dataset exploration | ✅ implemented |
+| 2. Data cleaning and preparation | ✅ implemented |
+| 3. Impact Score computation | ✅ implemented — both versions (per game and per 40 minutes) |
+| 4. Top 10 analysis | ✅ implemented — on both versions |
+| 5. Analysis by age band | ✅ implemented — on both versions |
+| 6. Search for significant correlations | ✅ implemented — minutes/impact correlation, scatter with regression and cluster analysis, on both versions |
+| 7. Player comparison | ✅ implemented — comparison tables and Top 10 bar charts, on both versions |
+| 8. Impact Score by position | ✅ implemented — averages by position and bar chart comparing the two versions |
+| 9. Conclusions | ✅ implemented — summary table with the two versions side by side |
 
 ---
 
-## Struttura del progetto
+## Project structure
 
 ```
 nba_analysis_exercise/
-├── analisi_nba.py                                    # script di analisi
+├── nba_analysis.py                                   # analysis script
 ├── nba_players_25_26_regular_season_wide_data.csv    # dataset
 ├── .gitignore
 └── README.md
 ```
 
-### Funzioni principali (`analisi_nba.py`)
+### Main functions (`nba_analysis.py`)
 
-| Funzione | Descrizione |
+| Function | Description |
 |---|---|
-| `explore_dataset(raw_data)` | Esplorazione iniziale: `head`, tipi di dato |
-| `build_season_totals(season_stats)` | Vista dei totali di stagione con `games_played`, `PTS`, `REB` |
-| `calculate_per_game_averages(season_stats)` | Calcolo delle medie per partita di tutte le statistiche |
-| `filter_by_games_played(per_game_stats)` | Filtro sui giocatori con almeno 1/3 delle partite del più utilizzato |
-| `calculate_impact_score_40(qualified_players)` | Formula con normalizzazione per 40 minuti (`impact_score_40`) e ordinamento decrescente |
-| `calculate_impact_score_game(qualified_players)` | Formula sulle medie per partita (`impact_score_game`) e ordinamento decrescente |
-| `calculate_top10_average_score_40` / `..._game` | Impact Score medio della Top 10, per ciascuna versione |
-| `calculate_top10_average_age_40` / `..._game` | Età media della Top 10, per ciascuna versione |
-| `build_age_group_table_40` / `..._game` | Tabella riepilogativa per fascia d'età (numero giocatori, media, massimo) |
-| `calculate_minutes_correlation_40` / `..._game` | Coefficiente di correlazione di Pearson tra minuti giocati e Impact Score |
-| `collect_correlations(ranking_game, ranking_40)` | Raccoglie le due correlazioni in un dizionario |
-| `plot_minutes_vs_score_40` / `..._game` | Scatter plot minuti/Impact Score con retta di regressione lineare |
-| `plot_cluster_analysis_40` / `..._game` | Cluster analysis K-Means (3 cluster) su minuti e Impact Score standardizzati |
-| `build_top10_comparison_game` / `..._40` | Tabella comparativa della Top 10 con le statistiche medie per partita |
-| `plot_top10_bar_chart_40` / `..._game` | Bar chart della Top 10 per ciascuna versione dell'indicatore |
-| `calculate_score_by_position_game` / `..._40` | Impact Score medio per ruolo, ordinato in senso decrescente |
-| `plot_position_comparison(scores_game, scores_40)` | Bar chart affiancato delle due medie per ruolo, con ruoli ordinati da `G` a `C` |
-| `build_conclusions_table(...)` | Tabella riepilogativa finale: le sei risposte dell'analisi, per partita e per 40 minuti |
+| `explore_dataset(raw_data)` | Initial exploration: `head`, data types |
+| `build_season_totals(season_stats)` | View of the season totals with `games_played`, `PTS`, `REB` |
+| `calculate_per_game_averages(season_stats)` | Per-game averages of every statistic |
+| `filter_by_games_played(per_game_stats)` | Keeps the players with at least 1/3 of the games of the most used one |
+| `calculate_impact_score_40(qualified_players)` | Formula normalised per 40 minutes (`impact_score_40`), sorted descending |
+| `calculate_impact_score_game(qualified_players)` | Formula on the per-game averages (`impact_score_game`), sorted descending |
+| `calculate_top10_average_score_40` / `..._game` | Average Impact Score of the Top 10, for each version |
+| `calculate_top10_average_age_40` / `..._game` | Average age of the Top 10, for each version |
+| `build_age_group_table_40` / `..._game` | Summary table by age band (number of players, average, maximum) |
+| `calculate_minutes_correlation_40` / `..._game` | Pearson correlation coefficient between minutes played and Impact Score |
+| `collect_correlations(ranking_game, ranking_40)` | Collects the two correlations into a dictionary |
+| `plot_minutes_vs_score_40` / `..._game` | Scatter plot minutes/Impact Score with the linear regression line |
+| `plot_cluster_analysis_40` / `..._game` | K-Means cluster analysis (3 clusters) on standardised minutes and Impact Score |
+| `build_top10_comparison_game` / `..._40` | Comparison table of the Top 10 with the per-game averages |
+| `plot_top10_bar_chart_40` / `..._game` | Bar chart of the Top 10 for each version of the indicator |
+| `calculate_score_by_position_game` / `..._40` | Average Impact Score by position, sorted descending |
+| `plot_position_comparison(scores_game, scores_40)` | Grouped bar chart of the two averages by position, positions ordered from `G` to `C` |
+| `build_conclusions_table(...)` | Final summary table: the six answers of the analysis, per game and per 40 minutes |
 
-Convenzione dei nomi: le funzioni iniziano con un verbo (`calculate_`, `build_`, `plot_`, `filter_`, `explore_`), le variabili sono sostantivi. Le funzioni che esistono in due versioni portano il suffisso `_game` o `_40`. I DataFrame che attraversano l'analisi si chiamano `season_stats` (totali di stagione) → `per_game_stats` (medie per partita) → `qualified_players` (dopo il filtro) → `ranking_game` / `ranking_40` (con l'Impact Score calcolato e ordinato).
+Naming convention: functions start with a verb (`calculate_`, `build_`, `plot_`, `filter_`, `explore_`), variables are nouns. Functions that exist in two versions carry the `_game` or `_40` suffix. The DataFrames that flow through the analysis are named `season_stats` (season totals) → `per_game_stats` (per-game averages) → `qualified_players` (after the filter) → `ranking_game` / `ranking_40` (with the Impact Score computed and sorted).
 
-### Note implementative
+### Implementation notes
 
-Scelte ricorrenti nel codice, raccolte qui per tenere i commenti nel file al minimo.
+Recurring choices in the code, collected here so the comments in the file can stay minimal.
 
-**Copie difensive.** Ogni funzione di analisi apre con una `.copy()` del DataFrame ricevuto e lavora sulla copia: il DataFrame del chiamante conserva le sue colonne originali, così le funzioni possono essere richiamate in qualunque ordine senza dipendere l'una dall'altra.
+**Defensive copies.** Every analysis function opens with a `.copy()` of the DataFrame it receives and works on the copy: the caller's DataFrame keeps its original columns, so the functions can be called in any order without depending on one another.
 
-**Divisioni per zero.** Le medie non vengono mai calcolate su un denominatore nullo. Prima di dividere, il denominatore passa per `.where(colonna > 0)`, che trasforma gli zeri in `NaN`: un giocatore con 0 partite (o 0 minuti) esce dall'analisi come dato mancante invece di generare un `inf`.
+**Divisions by zero.** Averages are never computed on a null denominator. Before dividing, the denominator goes through `.where(column > 0)`, which turns zeros into `NaN`: a player with 0 games (or 0 minutes) leaves the analysis as missing data instead of producing an `inf`.
 
-**Valori mancanti nei grafici.** `np.polyfit` restituisce coefficienti `NaN` se anche una sola riga è incompleta, e `KMeans` non accetta `NaN` del tutto: entrambe le funzioni fanno quindi `dropna` sulle due colonne che usano prima di calcolare.
+**Missing values in the charts.** `np.polyfit` returns `NaN` coefficients if even a single row is incomplete, and `KMeans` does not accept `NaN` at all: both functions therefore `dropna` on the two columns they use before computing.
 
-**Retta di regressione.** La retta viene tracciata su `np.sort(x.unique())` e non sulla `x` originale: senza ordinare, `plot` ripercorre la linea avanti e indietro seguendo l'ordine delle righe.
+**Regression line.** The line is drawn on `np.sort(x.unique())` rather than on the original `x`: without sorting, `plot` retraces the line back and forth following the order of the rows.
 
-**Figure separate.** Ogni funzione grafica apre la propria `plt.figure()` prima di disegnare, altrimenti i grafici finirebbero sovrapposti sugli stessi assi.
+**Separate figures.** Every chart function opens its own `plt.figure()` before drawing, otherwise the charts would end up stacked on the same axes.
 
-**Standardizzazione prima del K-Means.** Minuti e Impact Score vivono su scale diverse: senza `StandardScaler` la distanza euclidea sarebbe dominata dai minuti. Il numero di cluster (3) è quello con il miglior silhouette score su questo dataset, e `random_state=42` rende i cluster identici a ogni esecuzione.
+**Standardisation before K-Means.** Minutes and Impact Score live on different scales: without `StandardScaler` the euclidean distance would be dominated by the minutes. The number of clusters (3) is the one with the best silhouette score on this dataset, and `random_state=42` makes the clusters identical on every run.
 
-**`minutes_played` nascosto ma presente.** La colonna resta nei DataFrame perché correlazioni, scatter plot e cluster analysis sono costruiti su di essa; viene tolta solo al momento della `print`, per non appesantire le tabelle a console.
+**`minutes_played` hidden but present.** The column stays in the DataFrames because correlations, scatter plots and cluster analysis are built on it; it is dropped only at `print` time, to keep the console tables light.
 
 ---
 
-## Tecnologie
+## Technologies
 
 - Python
 - Pandas
@@ -235,31 +235,31 @@ Scelte ricorrenti nel codice, raccolte qui per tenere i commenti nel file al min
 
 ---
 
-## Come eseguire l'analisi
+## How to run the analysis
 
 ```bash
 pip install pandas numpy matplotlib scikit-learn
-python analisi_nba.py
+python nba_analysis.py
 ```
 
-Lo script va eseguito dalla cartella del progetto, dove si trova il file CSV.
+The script has to be run from the project folder, where the CSV file is.
 
-L'esecuzione stampa a console le tabelle riepilogative e apre **sette finestre Matplotlib**:
+Running it prints the summary tables to the console and opens **seven Matplotlib windows**:
 
-| # | Grafico |
+| # | Chart |
 |---|---|
-| 1 | Scatter plot minuti / `impact_score_40` con retta di regressione |
-| 2 | Scatter plot minuti / `impact_score_game` con retta di regressione |
-| 3 | Cluster analysis su minuti e `impact_score_40` |
-| 4 | Cluster analysis su minuti e `impact_score_game` |
-| 5 | Bar chart Top 10 per `impact_score_40` |
-| 6 | Bar chart Top 10 per `impact_score_game` |
-| 7 | Bar chart di confronto dell'Impact Score medio per ruolo |
+| 1 | Scatter plot minutes / `impact_score_40` with the regression line |
+| 2 | Scatter plot minutes / `impact_score_game` with the regression line |
+| 3 | Cluster analysis on minutes and `impact_score_40` |
+| 4 | Cluster analysis on minutes and `impact_score_game` |
+| 5 | Bar chart of the Top 10 by `impact_score_40` |
+| 6 | Bar chart of the Top 10 by `impact_score_game` |
+| 7 | Bar chart comparing the average Impact Score by position |
 
-Il main program è diviso in due blocchi: prima tutte le tabelle stampate a console nell'ordine delle fasi 1-8, poi tutti i grafici raggruppati per tipo (i due scatter, i due cluster, le due Top 10, il confronto per ruolo). Le finestre si aprono tutte insieme su `plt.show()`, quindi tenerle raggruppate rende prevedibile l'ordine in cui compaiono.
+The main program is split in two blocks: first every table printed to the console, in the order of phases 1 to 9, then every chart grouped by type (the two scatters, the two clusters, the two Top 10, the comparison by position). The windows all open together on `plt.show()`, so keeping them grouped makes the order in which they appear predictable.
 
 ---
 
-## Nota
+## Note
 
-L'analisi ha finalità esplorative: l'Impact Score rappresenta un indicatore costruito sulla base della formula e dei pesi definiti nel progetto e **non costituisce necessariamente una misura ufficiale dell'impatto utilizzata dalla NBA**.
+The analysis is exploratory: the Impact Score is an indicator built on the formula and the weights defined in this project and **is not necessarily an official measure of impact used by the NBA**.
