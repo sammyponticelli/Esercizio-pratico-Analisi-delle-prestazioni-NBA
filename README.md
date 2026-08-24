@@ -191,6 +191,24 @@ nba_analysis_exercise/
 | `impact_score_by_position_game` / `..._40` | Impact Score medio per ruolo, ordinato in senso decrescente |
 | `bar_chart_position_comparison(position_game, position_40)` | Bar chart affiancato delle due medie per ruolo, con ruoli ordinati da `G` a `C` |
 
+### Note implementative
+
+Scelte ricorrenti nel codice, raccolte qui per tenere i commenti nel file al minimo.
+
+**Copie difensive.** Ogni funzione di analisi apre con `data_impact.copy()` e lavora sulla copia: il DataFrame del chiamante conserva le sue colonne originali, così le funzioni possono essere richiamate in qualunque ordine senza dipendere l'una dall'altra.
+
+**Divisioni per zero.** Le medie non vengono mai calcolate su un denominatore nullo. Prima di dividere, il denominatore passa per `.where(colonna > 0)`, che trasforma gli zeri in `NaN`: un giocatore con 0 partite (o 0 minuti) esce dall'analisi come dato mancante invece di generare un `inf`.
+
+**Valori mancanti nei grafici.** `np.polyfit` restituisce coefficienti `NaN` se anche una sola riga è incompleta, e `KMeans` non accetta `NaN` del tutto: entrambe le funzioni fanno quindi `dropna` sulle due colonne che usano prima di calcolare.
+
+**Retta di regressione.** La retta viene tracciata su `np.sort(x.unique())` e non sulla `x` originale: senza ordinare, `plot` ripercorre la linea avanti e indietro seguendo l'ordine delle righe.
+
+**Figure separate.** Ogni funzione grafica apre la propria `plt.figure()` prima di disegnare, altrimenti i grafici finirebbero sovrapposti sugli stessi assi.
+
+**Standardizzazione prima del K-Means.** Minuti e Impact Score vivono su scale diverse: senza `StandardScaler` la distanza euclidea sarebbe dominata dai minuti. Il numero di cluster (3) è quello con il miglior silhouette score su questo dataset, e `random_state=42` rende i cluster identici a ogni esecuzione.
+
+**`minutes_played` nascosto ma presente.** La colonna resta nei DataFrame perché correlazioni, scatter plot e cluster analysis sono costruiti su di essa; viene tolta solo al momento della `print`, per non appesantire le tabelle a console.
+
 ---
 
 ## Tecnologie
